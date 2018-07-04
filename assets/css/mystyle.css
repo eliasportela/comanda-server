@@ -1,0 +1,105 @@
+#titleSite{
+	position: fixed;
+	color: #fff;
+	z-index: 6;
+	font-weight: bold;
+	padding: 16px
+}
+.text {
+	color: #777;
+}
+.menuDesktop{
+	position: absolute;
+	z-index: 1;
+	right: 0;
+	color: #fff;
+}
+.container-banner{
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
+}
+.image-banner{
+	width: 100%;
+	height: auto;
+}
+.container-home{
+	height: 70vh;
+	width: 70%
+}
+.col-home{
+	height: 70vh;
+}
+.col-home > div{
+	width: 80%;
+}
+.col-cotacoes{
+	height: 300px;
+}
+.container-empresa{
+	height:200px;
+	margin-bottom: 64px
+}
+.card-info{
+	height: 230px
+}
+.hover-btn:hover{
+	background-color: #4CAF50D9!important;
+	color: #FFF!important;
+}
+.hover-cabecalho:hover{
+	background-color: transparent!important;
+	color: #FFFFFFE0!important;
+}
+.endereco-section{
+	font-size: 18px
+}
+#map {
+	width: 100%;
+	height: 70vh;
+	background-color: grey;
+}	
+
+/*TABELAS WEGETS*/
+.na-cotacoes{
+	text-align: -webkit-center
+}
+.na-cotacoes .na-tabela{
+	width: 100%!important
+}
+tr.na-rotulo{
+	height: 65px!important
+}
+td > a > img {
+	display: none;
+}
+.na-cotacoes .na-tabela .linhapar{
+	background-color: #FFF!important;
+}
+thead > tr{
+	background-color: #4CAF50!important;
+}
+.na-cotacoes .na-tabela td,.na-cotacoes .na-tabela th{
+	padding: 4px!important
+}
+.na-cotacoes .na-tabela th{
+	color: #fff!important;
+}
+.na-cotacoes .na-tabela td{
+	border-bottom: 1px solid rgba(0,0,0,0.2)
+}
+.na-cotacoes .na-tabela td:lastchild{
+	border-bottom: none!important;
+}
+.na-cotacoes .na-tabela th > tr:firstchild{
+	color: #aaa!important
+}
+.na-cotacoes .na-titulo{
+	display: none;
+}
+tfoot > tr > td {
+	border: none!important;
+}
+tfoot > tr > td > div {
+	float: right!important;
+}

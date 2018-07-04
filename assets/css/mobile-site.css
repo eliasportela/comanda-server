@@ -1,0 +1,36 @@
+.bar-mobile{
+	padding: 6px 0;
+	position: fixed;
+	width: 100%;
+	z-index: 4
+}
+
+.bar-mobile i {
+	font-size: 1.3em
+}
+
+#menuCelular > a {
+	padding: 12px 0;
+	border-top: solid 1px rgba(255,255,255,0.5);
+}
+
+@media (max-width: 600px) 
+{
+	.image-banner
+	{
+		width: auto;
+		height: 100%
+	}
+	.col-cotacoes{
+		margin-top: 16px;
+		height: 335px
+	}
+
+	#cotacoes{
+		padding: 8px 0px!important
+	}
+
+	#cotacoes .w3-container{
+		margin-top: 32px
+	}
+}

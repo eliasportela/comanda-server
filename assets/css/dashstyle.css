@@ -1,0 +1,51 @@
+.container-btn-material{
+	position: relative;
+	height: 45px;
+}
+.btn-material{
+	margin-right: 45px;
+	position: absolute;
+	right: 0;
+	top: -12px;
+	width: 52px;
+	height: 52px;
+}
+
+.dash-video{
+	width: 100%;height: 100vh;overflow: hidden;
+}
+
+#myVideo{
+	width: 100%;height: auto;
+}
+
+#container-login{
+	width: 80%
+}
+
+#card-login{
+	width: 65%;margin-left: 20%
+}
+
+#btn-login{
+	display: none;
+}
+
+@media (max-width: 600px) 
+{
+	#myVideo{
+		width: auto;
+		height: 100%;
+	}
+	#container-login{
+		width: 100%
+	}
+	#card-login{
+		width: 100%;
+		margin-left: 0
+	}
+	#btn-login{
+		border: solid 1.5px #fff;
+		font-weight: bold;
+	}
+}
