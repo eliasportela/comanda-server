@@ -1,2 +1,2 @@
-# wp-corretora
-Sistema para corretora de cafés
+# LeCard
+Comanda Virtual para bares, lanchonetes  e restaurantes
