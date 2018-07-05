@@ -9,9 +9,6 @@ img{
 .w3-centered tr td {
   padding: 13px;
 }
-.w3-table tbody tr{
-  cursor: pointer;
-}
 .w3-table td{
   vertical-align: middle;
 }
@@ -70,7 +67,7 @@ img{
         </div>
       </div>
     </form>
-    <br>
+    <hr>
     <?php if ($editar): ?>
 
     <div>
@@ -78,23 +75,44 @@ img{
         <i class="fa fa-tags"></i>
         Composição
       </span>
+      <button class="w3-button w3-black w3-dark-gray w3-right" type="button" onclick="addSafraCafe()"><i class="fa fa-plus"></i> Adicionar Produto</button>
     </div>
     <br>
     <div class="w3-display-container w3-responsive w3-card w3-white w3-margin-bottom" style="min-height: 150px">
-      <table class="w3-table w3-bordered w3-centered w3-hoverable">
+      <table class="w3-table w3-bordered w3-centered">
         <thead>
           <tr class="w3-red">
             <th style="width: 30%">Referência</th>
             <th style="width: 40%">Nome</th>
-            <th style="width: 25%">Remover</th>
+            <th style="width: 30%">Remover</th>
           </tr>
         </thead>
         <tbody id="itens">
         </tbody>
       </table>
     </div>
-    <button class="w3-button w3-red w3-right w3-block w3-margin-bottom" type="button" onclick="addSafraCafe()"><i class="fa fa-plus"></i> Adicionar Produto</button>
+    <hr>
+    <div>
+      <span class="w3-large w3-padding">
+        <i class="fa fa-usd"></i>
+        Tabela de Preços
+      </span>
+      <button class="w3-button w3-dark-gray w3-right" type="button" onclick="addSafraCafe()"><i class="fa fa-plus"></i> Adicionar Tabela</button>
+    </div>
     <br>
+    <div class="w3-display-container w3-responsive w3-card w3-white w3-margin-bottom" style="min-height: 150px">
+      <table class="w3-table w3-bordered w3-centered ">
+        <thead>
+          <tr class="w3-red">
+            <th style="width: 30%">Tabela</th>
+            <th style="width: 40%">Valor</th>
+            <th style="width: 30%">Remover</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaPreco">
+        </tbody>
+      </table>
+    </div>
     <hr>
     <div>
       <span class="w3-large w3-padding">
@@ -104,7 +122,7 @@ img{
     </div>
     <br>
     <div class="w3-responsive w3-card w3-white w3-border w3-margin-bottom" style="min-height: 70px">
-      <button type="button" class="w3-button w3-red w3-round w3-margin" onclick="deletarProdutorId(<?=$produto?>)">
+      <button type="button" class="w3-button w3-red w3-margin" onclick="deletarProdutorId(<?=$produto?>)">
         <i class="fa fa-trash-o"></i>
         Deletar este Produto
       </button>
