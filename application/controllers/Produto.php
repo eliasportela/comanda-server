@@ -4,27 +4,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Content-Length, Accept-Encoding");
 
-class Produtor extends CI_Controller {
+class Produto extends CI_Controller {
 
 	function __construct(){
 		parent::__construct();
 		$this->load->library(['form_validation','upload','image_lib']);
 	} 
 	
-	//Tela Produtor
+	//Tela produto
 	public function index(){
 
 		$nivel_user = 1; //Nivel requirido para visualizar a pagina
 
 		if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)) {
 
-			$data["t_pessoas"] = $this->Crud_model->ReadAll("tipo_pessoa");
-			$header['title'] = "Dash | Produtores";
+			$data["categoria_produto"] = $this->Crud_model->ReadAll("categoria_produto");
+			$header['title'] = "Dash | Produto";
 			$menu['id_page'] = 3;
 
 			$this->load->view('dashboard/template/commons/header',$header);
 			$this->load->view('dashboard/template/commons/menu',$menu);
-			$this->load->view('dashboard/produtor/home',$data);
+			$this->load->view('dashboard/produto/home',$data);
 			$this->load->view('dashboard/template/commons/footer');
 			
 		}else{
@@ -32,29 +32,26 @@ class Produtor extends CI_Controller {
 		}
 	}
 
-	//Tela Cadastro Produtor
+	//Tela Cadastro produto
 	public function Cadastro() {
 
 		$nivel_user = 1; //Nivel requirido para visualizar a pagina
 
 		if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)){	
 			
-			$data["produtores"] = false;
-			
-			//Estados
-			$data["estados"] = $this->Crud_model->ReadAll("estado");
-			$data["t_pessoas"] = $this->Crud_model->ReadAll("tipo_pessoa");
+			$data["categoria_produto"] = $this->Crud_model->ReadAll("categoria_produto");
 
-			$header['title'] = "Dash | Cadastro Produtor";
-			$data['title'] = "Cadastro de Produtor";
-			$data['idFormulario'] = "inserirProdutor";
-			$data['btnFoto'] = "Selecionar";
+			$header['title'] = "Dash | Cadastro produto";
+			$data['title'] = "Cadastrar Produto";
+			$data['idFormulario'] = "inserirProduto";
 			$menu['id_page'] = 3;
-
+			
+			$data['produto'] = null;
+			$data['editar'] = false;
+			$data['coluna'] = "m3";
 			$this->load->view('dashboard/template/commons/header',$header);
 			$this->load->view('dashboard/template/commons/menu',$menu);
-			$this->load->view('dashboard/produtor/cadastro',$data);
-			$this->load->view('dashboard/produtor/modal-propriedade',$data);
+			$this->load->view('dashboard/produto/cadastro',$data);
 			$this->load->view('dashboard/template/commons/footer');
 			
 		}else{
@@ -63,38 +60,35 @@ class Produtor extends CI_Controller {
 
 	}
 
-	//Tela Edição Produtor
+	//Tela Edição produto
 	public function Editar() {
 
 		$nivel_user = 1; //Nivel requirido para visualizar a pagina
 
 		if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)){	
 			
-			$data["produtores"] = false;
-			
-			//Estados
-			$data["estados"] = $this->Crud_model->ReadAll("estado");
-			$data["t_pessoas"] = $this->Crud_model->ReadAll("tipo_pessoa");
+			//categoria produto
+			$data["categoria_produto"] = $this->Crud_model->ReadAll("categoria_produto");
 
-			$header['title'] = "Dash | Produtor";
-			$data['title'] = "Editar Produtor";
-			$data['idFormulario'] = "editarProdutor";
-			$data['btnFoto'] = "Alterar";
+			$header['title'] = "Dash | Editar Produto";
+			$data['title'] = "Editar Produto";
+			$data['idFormulario'] = "editarProduto";
 			$menu['id_page'] = 3;
 
-			$dataModel = $this->Crud_model->Read('produtor',array('id_produtor' => $this->uri->segment(3)));
+			$dataModel = $this->Crud_model->Read('produto',array('id_produto' => $this->uri->segment(3)));
 
 			if ($dataModel) {
 				
-				$data['produtor'] = $dataModel->id_produtor;
+				$data['produto'] = $dataModel->id_produto;
+				$data['editar'] = true;
+				$data['coluna'] = "m4";
 				$this->load->view('dashboard/template/commons/header',$header);
 				$this->load->view('dashboard/template/commons/menu',$menu);
-				$this->load->view('dashboard/produtor/cadastro',$data);
-				$this->load->view('dashboard/produtor/modal-propriedade',$data);
+				$this->load->view('dashboard/produto/cadastro',$data);
 				$this->load->view('dashboard/template/commons/footer');
 
 			}else{
-				redirect(base_url('admin/produtor'));	
+				redirect(base_url('admin/produto'));	
 			}
 			
 			
@@ -111,16 +105,28 @@ class Produtor extends CI_Controller {
 		
 		if ($ref > 0):
 			
-			$sql = "SELECT * FROM produtor p
-			INNER JOIN cidade c ON (c.id_cidade = p.id_cidade)
-			INNER JOIN estado e ON (e.id_estado = c.id_estado)
-			WHERE p.fg_ativo = 1 AND p.id_produtor = $ref";
+			$sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria
+			FROM produto p
+			WHERE fg_ativo = 1 AND id_produto = $ref";
 
 			$res = $this->Crud_model->Query($sql);
+			$res = $res[0];
 			
 			if ($res):
 				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
-				echo $json;
+				
+				$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto 
+				FROM item_produto ip 
+				INNER JOIN produto p ON (p.id_produto = ip.id_produto_item) 
+				WHERE ip.id_produto = $ref";
+
+				$res = $this->Crud_model->Query($sql);
+				if ($res):
+					$itens = json_encode($res,JSON_UNESCAPED_UNICODE);
+					echo '{"produto":'.$json.',"itens":'.$itens.'}';
+					return;
+				endif;
+
 				return;
 			endif;
 		else:
@@ -134,36 +140,39 @@ class Produtor extends CI_Controller {
 		$page = $ref * 20 - 20;
 
 		//Pesquisa
+		$referencia = "1=1";
 		$nome = "1=1";
-		$tipo = "1=1";
-		$cidade = "1=1";
+		$categoria = "1=1";
 		
+		if ($this->input->get("referencia") != null) {
+			$referencia = "p.ref_produto = '".$this->input->get("referencia")."'";
+		}
+
+		if ($this->input->get("categoria") != null && $this->input->get("categoria") != 0) {
+			$categoria = "p.id_categoria = ".$this->input->get("categoria");
+		}
+
 		if ($this->input->get("nome") != null) {
-			$nome = "p.nome_produtor LIKE '%".$this->input->get("nome")."%'";
+			$nome = "p.nome_produto LIKE '%".$this->input->get("nome")."%'";
 		}
 
-		if ($this->input->get("tipo") != null) {
-			$tipo = "p.id_tipo_pessoa = ".$this->input->get("tipo");
-		}
+		$sqlCount = "SELECT COUNT(*) as qtd FROM produto p 
+			INNER JOIN categoria_produto c ON (p.id_categoria = c.id_categoria)
+			WHERE $nome and $referencia and $categoria and p.fg_ativo = 1";
 
-		if ($this->input->get("cidade") != null) {
-			$cidade = "c.nome_cidade LIKE '%".$this->input->get("cidade")."%'";
-		}
-		
-		$res1 = $this->Crud_model->Count('produtor');
+		$res1 = $this->Crud_model->Query($sqlCount);
 		$qtd = 0;
-
-		if ($res1->total > 20):
-			$qtd = round($res1->total/20) + 1;
-		elseif($res1->total > 0):
+		
+		if ($res1[0]->qtd > 20):
+			$qtd = round($res1[0]->qtd/20) + 1;
+		elseif($res1[0]->qtd > 0):
 			$qtd = 1;
 		endif;
 
 		if ($ref > 0):
-			$sql = "SELECT * FROM produtor p 
-			INNER JOIN cidade c ON (p.id_cidade = c.id_cidade)
-			INNER JOIN tipo_pessoa t ON (p.id_tipo_pessoa = t.id_tipo_pessoa)
-			WHERE $nome and $tipo and $cidade
+			$sql = "SELECT * FROM produto p 
+			INNER JOIN categoria_produto c ON (p.id_categoria = c.id_categoria)
+			WHERE $nome and $referencia and $categoria and p.fg_ativo = 1
 			LIMIT 20 OFFSET $page";
 			$res = $this->Crud_model->Query($sql);
 			if ($res):
@@ -186,12 +195,12 @@ class Produtor extends CI_Controller {
 		if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
 
 			$dataRegister = $this->input->post();
-			if ($dataRegister AND $dataRegister['nome_produtor'] != NULL):
+			if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
 
 
 				$dataModel = array(
-					'nome_produtor' => trim($dataRegister['nome_produtor']),
-					'id_tipo_pessoa' => trim($dataRegister['id_tipo_pessoa']),
+					'nome_produto' => trim($dataRegister['nome_produto']),
+					'id_categoria' => trim($dataRegister['id_categoria']),
 					'cpf_cnpj' => trim($dataRegister['cpf_cnpj']),
 					'rg_inscricao_estadual' => trim($dataRegister['rg_inscricao_estadual']),
 					'data_nascimento' => trim($dataRegister['data_nascimento']),
@@ -199,16 +208,16 @@ class Produtor extends CI_Controller {
 					'membros_familia' => trim($dataRegister['membros_familia']),
 					'email' => trim($dataRegister['email']),
 					'telefone' => trim($dataRegister['telefone']),
-					'foto_produtor' => $foto_name,
+					'foto_produto' => $foto_name,
 					'endereco' => trim($dataRegister['endereco']),
 					'numero' => trim($dataRegister['numero']),
 					'complemento' => trim($dataRegister['complemento']),
 					'cep' => trim($dataRegister['cep']),
 					'bairro' => trim($dataRegister['bairro']),
-					'id_cidade' => trim($dataRegister['id_cidade']),
+					'id_categoria' => trim($dataRegister['id_cidade']),
 					'comprovante_bancario' => $comprovante_name,
 					'certificados' => trim($dataRegister['certificados']));
-				$res = $this->Crud_model->InsertId('produtor',$dataModel);
+				$res = $this->Crud_model->InsertId('produto',$dataModel);
 
 
 			//Config ambiente de upload
@@ -238,8 +247,8 @@ class Produtor extends CI_Controller {
 					$comprovante_name = $dadosImagem['file_name'];
 				}
 
-				$dataModel = array('comprovante_bancario' => $foto_name,'foto_produtor' => $comprovante_name);
-				$upload = $this->Crud_model->Update('produtor',$dataModel,array('id_produtor' => $res));
+				$dataModel = array('comprovante_bancario' => $foto_name,'foto_produto' => $comprovante_name);
+				$upload = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $res));
 
 				if($res and $upload):
 					echo $res;
@@ -295,8 +304,8 @@ class Produtor extends CI_Controller {
 				}
 
 				$dataModel = array(
-					'nome_produtor' => trim($dataRegister['nome_produtor']),
-					'id_tipo_pessoa' => trim($dataRegister['id_tipo_pessoa']),
+					'nome_produto' => trim($dataRegister['nome_produto']),
+					'id_categoria' => trim($dataRegister['id_categoria']),
 					'cpf_cnpj' => trim($dataRegister['cpf_cnpj']),
 					'rg_inscricao_estadual' => trim($dataRegister['rg_inscricao_estadual']),
 					'data_nascimento' => trim($dataRegister['data_nascimento']),
@@ -313,13 +322,13 @@ class Produtor extends CI_Controller {
 					'certificados' => trim($dataRegister['certificados']));
 
 			//caso mudou a img exclui a anterior
-				$sql = "SELECT foto_produtor, comprovante_bancario FROM produtor WHERE id_produtor = $dataId";
+				$sql = "SELECT foto_produto, comprovante_bancario FROM produto WHERE id_produto = $dataId";
 				$upload = $this->Crud_model->Query($sql);
 
 				if ($foto_name) {
-					$dataModel = array_merge($dataModel,array('foto_produtor' => $foto_name));
+					$dataModel = array_merge($dataModel,array('foto_produto' => $foto_name));
 					if ($upload) {
-						unlink($path.$upload[0]->foto_produtor);
+						unlink($path.$upload[0]->foto_produto);
 					}
 				}
 				if ($comprovante_name) {
@@ -330,7 +339,7 @@ class Produtor extends CI_Controller {
 				}
 
 
-				$res = $this->Crud_model->Update('produtor',$dataModel,array('id_produtor' => $dataId));
+				$res = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $dataId));
 
 				if($res):
 					echo $res;
@@ -352,7 +361,7 @@ class Produtor extends CI_Controller {
 			$dataId = (int)$this->uri->segment(5);
 			if ($dataId > 0):
 
-				$sql = "SELECT id_propriedade FROM propriedade WHERE id_produtor = $dataId";
+				$sql = "SELECT id_propriedade FROM propriedade WHERE id_produto = $dataId";
 				$query = $this->Crud_model->Query($sql);
 				if ($query) {
 					foreach ($query as $q) {
@@ -362,8 +371,8 @@ class Produtor extends CI_Controller {
 					}
 				}
 				//remove todas as propriedades
-				$propriedade = $this->Crud_model->Delete('propriedade',array('id_produtor' => $dataId));
-				$res = $this->Crud_model->Delete('produtor',array('id_produtor' => $dataId));
+				$propriedade = $this->Crud_model->Delete('propriedade',array('id_produto' => $dataId));
+				$res = $this->Crud_model->Delete('produto',array('id_produto' => $dataId));
 
 				if($res):
 					//remove a pasta

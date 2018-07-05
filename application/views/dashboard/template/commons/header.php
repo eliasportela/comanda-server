@@ -20,7 +20,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <script type="text/javascript" src="<?php echo base_url('assets/vendor/jquery/jquery.min.js');?>"></script>
 <body class="w3-light-grey">
 
-	<div class="w3-bar w3-top w3-large <?= $login = isset($tela_login) ? "w3-text-white" : "w3-black" ?>" style="z-index:4;padding: 5px">
+	<div class="w3-bar w3-top w3-large <?= $login = isset($tela_login) ? "w3-text-white" : "w3-red" ?>" style="z-index:4;padding: 5px">
 		<a href="<?=base_url('admin')?>" class="w3-bar-item w3-left w3-hide-small">LeCard</a>
 		<?php if ($this->session->userdata('logged')): ?>
 			<button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>

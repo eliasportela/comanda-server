@@ -1,9 +1,9 @@
 jQuery(document).ready(function(){
 
 	//Buscando Produtor
-	if ($("#id_produtor").val() != undefined) {
-		IDPRODUTOR = $("#id_produtor").val();
-		getProdutorID(IDPRODUTOR);
+	if ($("#id_produto").val() != undefined) {
+		IDPRODUTO = $("#id_produto").val();
+		getProdutorID(IDPRODUTO);
 	}
 	
 	jQuery('#editarProdutor').submit(function(){
@@ -14,7 +14,7 @@ jQuery(document).ready(function(){
 		}else{
 
 			var dadosajax = new FormData(this);
-			pageurl = base_urla + 'admin/api/produtor/editar/' + IDPRODUTOR;
+			pageurl = base_urla + 'admin/api/produtor/editar/' + IDPRODUTO;
 
 			request("Salvando as alterações");
 			$.ajax({
@@ -47,52 +47,47 @@ jQuery(document).ready(function(){
 
 });
 
-var IDPRODUTOR = "";
+var IDPRODUTO = "";
 
 function getProdutorID(id){
 	
-	var url = base_urla + 'admin/api/produtor/id/'+id;
+	var url = base_urla + 'admin/api/produto/id/'+id;
 	var data = null;
+	var selector = $("#itens");
+	
+	selector.empty();
 	
 	$.get(url, function(res) {
 		
 		if (res) {
 			data = JSON.parse(res);
-			data = data[0];
-			$("#nome_produtor").val(data.nome_produtor);
-			$("#tipo_pessoa").val(data.id_tipo_pessoa);
-			$("#cpf_cnpj").val(data.cpf_cnpj);
-			$("#rg_inscricao_estadual").val(data.rg_inscricao_estadual);
-			$("#data_nascimento").val(data.data_nascimento);
-			$("#escolaridade").val(data.escolaridade);
-			$("#membros_familia").val(data.membros_familia);
-			$("#email").val(data.email);
-			$("#telefone").val(data.telefone);
-			$("#endereco").val(data.endereco);
-			$("#numero").val(data.numero);
-			$("#complemento").val(data.complemento);
-			$("#cep").val(data.cep);
-			$("#bairro").val(data.bairro);
-			$("#selectEstados").val(data.id_estado);
-			$("#certificados").val(data.certificados);
+			produto = data.produto;
+			itens = data.itens;
+
+			$("#nome_produto").val(produto.nome_produto);
+			$("#categoria_produto").val(produto.id_categoria);
+			$("#referencia").val(produto.ref_produto);
+			
 		}else{
 			swal("","Erro interno, por favor recarregue a página","error");
 		}
 	})
 	.done(function(){
-    	getCidades('selectEstados','selectCidades',data.id_cidade);
-    	$("#id").val(data.id_estado);
-    	selectTipoPessoa();
-    	//imgs
-    	if (data.foto_produtor != "") {
-    		$("#image-foto-bd").attr("src",base_urla + 'uploads/docs/'+IDPRODUTOR+'/'+data.foto_produtor);
-    		$("#image-foto-bd").css("display","block");
-    	}
-    	if (data.comprovante_bancario != "") {
-    		$("#view-comprovante").attr("href",base_urla + 'uploads/docs/'+IDPRODUTOR+'/'+data.comprovante_bancario);
-    		$("#image-comprovante-bd").css("display","block");
-    	}
+		itens.forEach(function(obj){
+			var col = "";
+			col += "<td></td>";
+			col += "<td>"+obj.ref_produto+"</td>";
+			col += "<td>"+obj.nome_produto+"</td>";
+			col += "<td>Remover</td>";
+			console.log(col);
+			selector.append("<tr"+col+"</tr>");
+		});
     });
+}
+
+
+function alterTableItens(itens){
+
 }
 
 function deletarProdutorId(id) {

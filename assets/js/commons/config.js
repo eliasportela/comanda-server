@@ -1,1 +1,1 @@
-var base_urla = "http://localhost/wp-corretora/";
+var base_urla = "http://localhost/comanda-server/";
