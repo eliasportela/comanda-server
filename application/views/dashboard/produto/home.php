@@ -2,7 +2,7 @@
 h6{
   margin: 3px 0;
 }
-.table-produtor{
+.table-produto{
   min-height: 200px;
   position: relative;
 }
@@ -20,7 +20,7 @@ h6{
   <!-- Header -->
   <header class="w3-container w3-cell-row" style="padding-top:22px">
     <span class="w3-xlarge"><i class="fa fa fa-edit fa-fw"></i>Produtos</span>
-    <button onclick="window.location.href='<?=base_url("admin/produtor/cadastro")?>'" class="w3-button w3-round w3-red w3-right"><i class="fa fa-plus"></i> Cadastrar</button>  
+    <button onclick="window.location.href='<?=base_url("admin/produto/cadastro")?>'" class="w3-button w3-round w3-red w3-right"><i class="fa fa-plus"></i> Cadastrar</button>  
     <button class="w3-button w3-red w3-right" style="margin-right: 12px" onclick="limparSearch(1)">Limpar Filtros</button>
   </header>
   <div class="w3-panel">
@@ -52,7 +52,7 @@ h6{
       </div>
       <br>
       <div class="w3-responsive w3-card">
-        <div class="w3-white table-produtor">
+        <div class="w3-white table-produto">
           <table class="w3-table w3-hoverable w3-bordered w3-centered">
             <thead>
               <tr class="w3-red">

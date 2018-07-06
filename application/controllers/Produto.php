@@ -125,6 +125,8 @@ class Produto extends CI_Controller {
 					$itens = json_encode($res,JSON_UNESCAPED_UNICODE);
 					echo '{"produto":'.$json.',"itens":'.$itens.'}';
 					return;
+				else:
+					echo '{"produto":'.$json.',"itens":""}';
 				endif;
 
 				return;
@@ -197,60 +199,28 @@ class Produto extends CI_Controller {
 			$dataRegister = $this->input->post();
 			if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
 
+				
+				$nome_produto = trim($dataRegister['nome_produto']);
+				$id_categoria = trim($dataRegister['id_categoria']);
+				$gerar_referencia = trim($dataRegister['gerar_referencia']);
+				$referencia = "";
+
+				if(isset($dataRegister['referencia'])){
+					$referencia = trim($dataRegister['referencia']);
+				}
+				
+				if($gerar_referencia == 1 OR $referencia == ""){
+					$referencia = "R".rand(1,1000000);
+				}
 
 				$dataModel = array(
-					'nome_produto' => trim($dataRegister['nome_produto']),
-					'id_categoria' => trim($dataRegister['id_categoria']),
-					'cpf_cnpj' => trim($dataRegister['cpf_cnpj']),
-					'rg_inscricao_estadual' => trim($dataRegister['rg_inscricao_estadual']),
-					'data_nascimento' => trim($dataRegister['data_nascimento']),
-					'escolaridade' => trim($dataRegister['escolaridade']),
-					'membros_familia' => trim($dataRegister['membros_familia']),
-					'email' => trim($dataRegister['email']),
-					'telefone' => trim($dataRegister['telefone']),
-					'foto_produto' => $foto_name,
-					'endereco' => trim($dataRegister['endereco']),
-					'numero' => trim($dataRegister['numero']),
-					'complemento' => trim($dataRegister['complemento']),
-					'cep' => trim($dataRegister['cep']),
-					'bairro' => trim($dataRegister['bairro']),
-					'id_categoria' => trim($dataRegister['id_cidade']),
-					'comprovante_bancario' => $comprovante_name,
-					'certificados' => trim($dataRegister['certificados']));
+					'nome_produto' => $nome_produto,
+					'id_categoria' => $id_categoria,
+					'ref_produto' => $referencia);
+
 				$res = $this->Crud_model->InsertId('produto',$dataModel);
 
-
-			//Config ambiente de upload
-				$path = './uploads/docs/'.$res;
-				$config['upload_path'] = $path;
-				$config['allowed_types'] = 'pdf|jpg|jpeg|png';
-				$config['max_size'] = '5000';
-				$config['encrypt_name']  = TRUE;
-				$this->upload->initialize($config);
-
-			//verifica se o path é válido, se não for cria o diretório
-				if (!is_dir($path)) {
-					mkdir($path, 0777, $recursive = true);
-				}
-
-				if (!$this->upload->do_upload('foto_file')) {
-					$foto_name = "";
-				} else {
-					$dadosImagem = $this->upload->data();
-					$foto_name = $dadosImagem['file_name'];
-				}
-
-				if (!$this->upload->do_upload('comprovante_file')) {
-					$comprovante_name = "";
-				} else {
-					$dadosImagem = $this->upload->data();
-					$comprovante_name = $dadosImagem['file_name'];
-				}
-
-				$dataModel = array('comprovante_bancario' => $foto_name,'foto_produto' => $comprovante_name);
-				$upload = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $res));
-
-				if($res and $upload):
+				if($res):
 					echo $res;
 					$this->output->set_status_header('200');
 					return;

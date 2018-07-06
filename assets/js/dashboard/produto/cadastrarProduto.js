@@ -23,7 +23,7 @@ jQuery(document).ready(function(){
 				swal({
 					title: '',text: 'Dados inseridos com sucesso!!',type: 'success'
 				},function(){
-					window.location.href = base_urla +"admin/produtor/" + data;
+					window.location.href = base_urla +"admin/produto/" + data;
 				});
 				
 			},
@@ -44,7 +44,7 @@ jQuery(document).ready(function(){
 //Toogle Disable input gerarReferencia 
 function toogleGerarReferencia(){
 	var tipo = $("#gerar-referencia").val();
-	if (tipo == 0) {
+	if (tipo == 1) {
 		$("#referencia").val("");
 		$("#referencia").prop("disabled","true");
 	}
