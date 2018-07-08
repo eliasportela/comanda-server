@@ -33,25 +33,19 @@ $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar/(:num)']['post'] = 'Produto/Edit';
 $route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';
 
-#Propriedades
-$route['admin/api/propriedade/(:num)']['get'] = 'Propriedade/Get';
-$route['admin/api/propriedade/id/(:num)']['get'] = 'Propriedade/GetId';
-$route['admin/api/propriedade']['post'] = 'Propriedade/Register';
-$route['admin/api/propriedade/(:num)']['post'] = 'Propriedade/Edit';
-$route['admin/api/propriedade/remover/(:num)'] = 'Propriedade/Remove';
+#Produto Preço e Itens (id-produto/id-tabela)
+$route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeletePrevisao';
+$route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamento';
 
-#Safras
-$route['admin/api/safra-previsao/(:num)']['get'] = 'Safra/GetPrevisao';
-$route['admin/api/safra-fechamento/(:num)']['get'] = 'Safra/GetFechamento';
-$route['admin/api/safra-cafe/(:num)']['get'] = 'Safra/GetCafe';
-$route['admin/api/safra-previsao/remover/(:num)'] = 'Safra/DeletePrevisao';
-$route['admin/api/safra-fechamento/remover/(:num)'] = 'Safra/DeleteFechamento';
-$route['admin/api/safra-cafe/remover/(:num)'] = 'Safra/DeleteCafe';
+#Comanda
+$route['admin/comanda'] = 'Comanda';
+$route['admin/comanda/(:num)'] = 'Comanda/Editar';
+$route['admin/comanda/cadastro'] = 'Comanda/Cadastro';
 
-#Contato
-$route['admin/contatos'] = 'Contato';
-$route['admin/notificacao-contato'] = 'Contato/NotificacaoContato';
-$route['admin/visualizacao-contato'] = 'Contato/VisualizacaoContato';
+$route['admin/api/comandas']['get'] = 'Comanda/Comandas';
+$route['admin/api/comanda/id/(:num)']['get'] = 'Comanda/ComandaId';
+$route['admin/api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
+$route['admin/api/comanda-pruduto/(:num)/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 
 #Util
 $route['admin/api/cidade'] = 'Util/GetCidades';

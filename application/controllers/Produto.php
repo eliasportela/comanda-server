@@ -82,6 +82,11 @@ class Produto extends CI_Controller {
 				$data['produto'] = $dataModel->id_produto;
 				$data['editar'] = true;
 				$data['coluna'] = "m4";
+				$data['tabela'] = $this->Crud_model->ReadAll('tabela_preco');
+
+				$sql = "SELECT id_produto, nome_produto FROM produto WHERE fg_ativo = 1 AND id_categoria = 1";
+				$data['produtos'] = $this->Crud_model->Query($sql);
+
 				$this->load->view('dashboard/template/commons/header',$header);
 				$this->load->view('dashboard/template/commons/menu',$menu);
 				$this->load->view('dashboard/produto/cadastro',$data);

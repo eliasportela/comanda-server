@@ -3,7 +3,7 @@ jQuery(document).ready(function () {
 	//Buscando Produtor
 	if ($("#id_produto").val() != undefined) {
 		IDPRODUTO = $("#id_produto").val();
-		getProdutorID(IDPRODUTO);
+		getProdutoID(IDPRODUTO);
 	}
 
 	jQuery('#editarProdutor').submit(function () {
@@ -47,7 +47,7 @@ jQuery(document).ready(function () {
 
 var IDPRODUTO = "";
 
-function getProdutorID(id) {
+function getProdutoID(id) {
 
 	var url = base_urla + 'admin/api/produto/id/' + id;
 	var data = null;
@@ -73,7 +73,6 @@ function getProdutorID(id) {
 			if (itens != "") {
 				itens.forEach(function (obj) {
 					var col = "";
-					col += "<td>" + obj.ref_produto + "</td>";
 					col += "<td>" + obj.nome_produto + "</td>";
 					col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
 					selector.append("<tr>" + col + "</tr>");
@@ -100,25 +99,46 @@ function deletarProdutorId(id) {
 }
 
 var ITEM = 0;
+var PRECO = 0;
 
 function addItemTabela() {
 
 	var selector = $("#tableItens");
 	var col = "";
 	col += '<td>' +
-		'<input type="number" value="2019" class="w3-input w3-border" name="safraPreAnoFim[]" min="1900" max="2099" required>' +
+		'<input type="hidden" value="' + $("#produtos").val() + '" class="w3-input w3-border" name="produtos[]" required>' +
+		$("#produtos :selected").text() +
 		'</td>';
 	col += '<td>' +
-		'<input type="number" class="w3-input w3-border" placeholder="Quantidade de sacas" name="safraPreQtd[]" required>' +
-		'</td>';
-	col += '<td>' +
-		'<button class="w3-button w3-border w3-round" type="button" onclick="removeSafraPrevisao(' + ITEM + ')">' +
-		'<i class="fa fa-times"></i> Remover' +
+		'<button class="w3-button w3-dark-gray w3-round" type="button" onclick="removeSafraPrevisao(' + ITEM + ')">' +
+		'Remover' +
 		'</button>' +
 		'</td>';
 	selector.append("<tr id='rowTabelaItens" + ITEM + "'>" + col + "</tr>");
 
 	ITEM = ITEM + 1;
+}
+
+function addPrecoTabela() {
+
+	var selPreco = $("#tablePreco");
+	var col = "";
+	col += '<td>' +
+		'<input type="hidden" value="' + $("#precos").val() + '" class="w3-input w3-border" name="precos[]" required>' +
+		$("#precos :selected").text() +
+		'</td>';
+	col += '<td>' +
+		'<input type="hidden" value="' + $("#precosValor").val() + '" class="w3-input w3-border" name="precos[]" required>' +
+		$("#precosValor").val() +
+		'</td>';
+	col += '<td>' +
+		'<button class="w3-button w3-dark-gray w3-round" type="button" onclick="removeSafraPrevisao(' + ITEM + ')">' +
+		'Remover' +
+		'</button>' +
+		'</td>';
+	selPreco.append("<tr id='rowTabelaItens" + PRECO + "'>" + col + "</tr>");
+
+	PRECO = PRECO + 1;
 }
 
 function removeSafraPrevisao(id) {
