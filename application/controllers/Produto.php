@@ -1,8 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Content-Length, Accept-Encoding");
+header('Access-Control-Allow-Origin: *');
 
 class Produto extends CI_Controller {
 
@@ -349,39 +348,57 @@ class Produto extends CI_Controller {
 				$propriedade = $this->Crud_model->Delete('propriedade',array('id_produto' => $dataId));
 				$res = $this->Crud_model->Delete('produto',array('id_produto' => $dataId));
 
-				if($res):
-					//remove a pasta
-					$path = './uploads/docs/'.$dataId.'/';
-					$this->unlinkRecursive($path);
-					$this->output->set_status_header('200');
-					return;
-				endif;
 			endif;
 		else:
 			$this->output->set_status_header('400');
 		endif;
 	}
 
-	//funcao deletar pasta e conteudo
-	function unlinkRecursive($path) {
+	public function getProdutosCategoriaTabela(){
+		$id = $this->uri->segment(4);
+		
+		if ($id > 0):
+			
+			$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto, p.id_categoria, t.id_tabela ,t.nome_tabela
+			FROM produto p
+			INNER JOIN tabela_produto tp ON (tp.id_produto = p.id_produto)
+			INNER JOIN tabela_preco t ON (t.id_tabela = tp.id_tabela)
+			WHERE p.fg_ativo = 1 AND p.id_categoria = $id order by p.id_produto, t.id_tabela";
 
-		if($dh = @opendir($path)) { 
+			$res = $this->Crud_model->Query($sql);
+			
+			if ($res):
+				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
+				echo $json;
+				return;
+			endif;
+		else:
+			$this->output->set_status_header('500');
+		endif;	
+	}
 
-			while (false !== ($obj = readdir($dh))) 
-			{ 
-				if($obj == '.' || $obj == '..') 
-				{ 
-					continue; 
-				} 
-				if (!@unlink($path . '/' . $obj)) 
-				{ 
-					$this->unlinkRecursive($path.'/'.$obj, true);
-				} 
-			} 
-			closedir($dh); 
-			@rmdir($path);
-		}
-		return;
-	} 
+	public function getProdutosCategoria(){
+		$id = $this->uri->segment(4);
+		
+		if ($id > 0):
+			
+			$sql = "SELECT id_produto, nome_produto
+			FROM produto
+			WHERE fg_ativo = 1 AND id_categoria = $id";
+
+			$res = $this->Crud_model->Query($sql);
+			
+			if ($res):
+				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
+				echo $json;
+				return;
+			endif;
+		else:
+			$this->output->set_status_header('500');
+		endif;	
+	}
+
+	
+	
 
 }

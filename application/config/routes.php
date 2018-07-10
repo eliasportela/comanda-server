@@ -29,6 +29,8 @@ $route['admin/produto/cadastro'] = 'Produto/Cadastro';
 
 $route['admin/api/produto/(:num)']['get'] = 'Produto/Get';
 $route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId';
+$route['admin/api/produtos-categoria/(:num)']['get'] = 'Produto/getProdutosCategoria';
+$route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar/(:num)']['post'] = 'Produto/Edit';
 $route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';
@@ -48,7 +50,8 @@ $route['admin/api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
 $route['admin/api/comanda-pruduto/(:num)/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 
 #Util
-$route['admin/api/cidade'] = 'Util/GetCidades';
+$route['admin/api/categoria-produtos'] = 'Util/GetCategoriasProdutos';
+$route['admin/api/tabela-categoria/(:num)'] = 'Util/GetTabelaCategoria';
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
