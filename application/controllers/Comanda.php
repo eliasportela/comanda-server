@@ -193,4 +193,35 @@ class Comanda extends CI_Controller {
 		endif;
 	}
 
+	public function InserirProdutoComanda(){
+		
+		$dataRegister = $this->input->post();
+		//$dataRegister = json_decode($dataRegister);
+
+		die(var_dump($dataRegister));
+
+		if ($dataRegister != null) {
+			$this->output->set_status_header('500');
+			return;
+		}
+
+		$nome = $dataRegister['id_comanda'];
+		$nome = $dataRegister['id_produto'];
+		$nome = $dataRegister['gerar_pedido'];
+		$nome = $dataRegister['quantidade'];
+		$nome = $dataRegister['id_tabela_produto'];
+		$nome = $dataRegister['observacao'];
+		
+		$sql = "INSERT INTO comanda_produto (id_comanda,id_produto,gerar_pedido,quantidade,id_tabela_produto,observacao)
+				VALUES ($id_comanda,$id_produto,$gerar_pedido,$quantidade,$id_tabela_produto,$observacao)";
+
+		$res = $this->Crud_model->Query($sql);
+
+		if($res)  {	
+			$this->output->set_status_header('200');
+		}else {
+			$this->output->set_status_header('500');
+		}
+	}
+
 }
