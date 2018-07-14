@@ -359,7 +359,7 @@ class Produto extends CI_Controller {
 		
 		if ($id > 0):
 			
-			$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto, p.id_categoria, t.id_tabela ,t.nome_tabela, c.gerar_pedido
+			$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto, p.id_categoria, tp.id_tabela_produto, t.nome_tabela, c.gerar_pedido
 			FROM produto p
 			INNER JOIN tabela_produto tp ON (tp.id_produto = p.id_produto)
 			INNER JOIN tabela_preco t ON (t.id_tabela = tp.id_tabela)
@@ -398,8 +398,5 @@ class Produto extends CI_Controller {
 			$this->output->set_status_header('500');
 		endif;	
 	}
-
-	
-	
 
 }

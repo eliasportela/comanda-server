@@ -47,7 +47,7 @@ $route['admin/comanda/cadastro'] = 'Comanda/Cadastro';
 $route['admin/api/comandas']['get'] = 'Comanda/Comandas';
 $route['admin/api/comanda/id/(:num)']['get'] = 'Comanda/ComandaId';
 $route['admin/api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
-$route['admin/api/comanda-pruduto/(:num)/(:num)']['get'] = 'Comanda/ProdutoComandaId';
+$route['admin/api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 $route['admin/api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
 
 #Util

@@ -143,14 +143,14 @@ class Comanda extends CI_Controller {
 		$id = $this->uri->segment(4);
 		if ($id > 0):
 			
-			$sql = "SELECT p.id_produto, c.id_comanda, p.ref_produto, cat.nome_categoria, p.nome_produto, cp.quantidade, t.valor, tp.nome_tabela
+			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, t.valor, tp.nome_tabela
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
 			INNER JOIN tabela_produto t ON (t.id_tabela_produto = cp.id_tabela_produto)
 			INNER JOIN tabela_preco tp ON (tp.id_tabela = t.id_tabela)
-			WHERE cp.fg_ativo = 1 AND c.id_comanda = $id";
+			WHERE cp.fg_ativo = 1 AND c.id_comanda = $id ORDER BY cp.id_comanda_produto";
 
 			$res = $this->Crud_model->Query($sql);
 			
@@ -166,19 +166,18 @@ class Comanda extends CI_Controller {
 
 	public function ProdutoComandaId(){
 
-		$comanda = $this->uri->segment(4);
-		$produto = $this->uri->segment(5);
+		$produto = $this->uri->segment(4);
 
-		if ($produto > 0 AND $comanda > 0):
+		if ($produto > 0):
 			
-			$sql = "SELECT p.id_produto, c.id_comanda, p.ref_produto, cat.nome_categoria, p.nome_produto, cp.quantidade, cp.observacao, t.valor, tp.nome_tabela
+			$sql = "SELECT cp.id_comanda_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, tp.nome_tabela, cp.observacao
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
 			INNER JOIN tabela_produto t ON (t.id_tabela_produto = cp.id_tabela_produto)
 			INNER JOIN tabela_preco tp ON (tp.id_tabela = t.id_tabela)
-			WHERE cp.fg_ativo = 1 AND cp.id_produto = $produto AND cp.id_comanda = $comanda";
+			WHERE cp.fg_ativo = 1 AND cp.id_comanda_produto = $produto";
 
 			$res = $this->Crud_model->Query($sql);
 			$res = $res[0];
@@ -196,27 +195,53 @@ class Comanda extends CI_Controller {
 	public function InserirProdutoComanda(){
 		
 		$dataRegister = $this->input->post();
-		//$dataRegister = json_decode($dataRegister);
-
-		die(var_dump($dataRegister));
-
-		if ($dataRegister != null) {
+		
+		if ($dataRegister == null) {
 			$this->output->set_status_header('500');
 			return;
 		}
 
-		$nome = $dataRegister['id_comanda'];
-		$nome = $dataRegister['id_produto'];
-		$nome = $dataRegister['gerar_pedido'];
-		$nome = $dataRegister['quantidade'];
-		$nome = $dataRegister['id_tabela_produto'];
-		$nome = $dataRegister['observacao'];
+		//die(var_dump($dataRegister));
+
+		$id_comanda = $dataRegister['id_comanda'];
+		$id_produto = $dataRegister['id_produto'];
+		$gerar_pedido = $dataRegister['gerar_pedido'];
+		$quantidade = $dataRegister['quantidade'];
+		$id_tabela_produto = $dataRegister['id_tabela_produto'];
+		$observacao = $dataRegister['observacao'];
+
+		$dataObservacao = "";
+
+		$adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
+		if ($adicionais != null) {
+			$obsTemp = "";
+			foreach ($adicionais as $ads) {
+				$adsProduto = explode('||', $ads);
+				$adsId = $adsProduto[0];
+				$adsTabela = $adsProduto[1];
+				$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_produto' => $adsTabela);
+				$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
+				
+				if ($res) {
+					$dataAds = $this->Crud_model->Read('produto',array('id_produto' => $adsId));
+					$obsTemp .= $dataAds->nome_produto . ", ";
+				}
+			}
+			$dataObservacao .= "||Adicionais: " . substr($obsTemp, 0, -2);
+		}
+
+		$remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
+		if ($remocoes != null) {
+			$obsTemp = "";
+			foreach ($remocoes as $obs) {
+				$obsTemp .= $obs . ", ";
+			}
+			$dataObservacao .= "||Remoções: " . substr($obsTemp, 0, -2);
+		}
+
+		$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $id_produto, 'gerar_pedido' => $gerar_pedido, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto, 'observacao' => $dataObservacao."||Cliente: ".$observacao);
+		$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
 		
-		$sql = "INSERT INTO comanda_produto (id_comanda,id_produto,gerar_pedido,quantidade,id_tabela_produto,observacao)
-				VALUES ($id_comanda,$id_produto,$gerar_pedido,$quantidade,$id_tabela_produto,$observacao)";
-
-		$res = $this->Crud_model->Query($sql);
-
 		if($res)  {	
 			$this->output->set_status_header('200');
 		}else {
