@@ -46,9 +46,16 @@ $route['admin/comanda/cadastro'] = 'Comanda/Cadastro';
 
 $route['admin/api/comandas']['get'] = 'Comanda/Comandas';
 $route['admin/api/comanda/id/(:num)']['get'] = 'Comanda/ComandaId';
+$route['admin/api/comanda/ref/(:any)']['get'] = 'Comanda/ComandaRef';
+$route['admin/api/comanda/inserir-comanda']['post'] = 'Comanda/InserirComanda';
 $route['admin/api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
 $route['admin/api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 $route['admin/api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
+
+//Pedido
+$route['admin/api/pedidos-comanda/(:num)']['get'] = 'Pedido/PedidosComanda';
+
+$route['admin/api/cardapio/(:num)']['get'] = 'Cardapio/ListarCardapio';
 
 #Util
 $route['admin/api/categoria-produtos'] = 'Util/GetCategoriasProdutos';

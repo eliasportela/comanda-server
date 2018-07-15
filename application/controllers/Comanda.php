@@ -90,11 +90,10 @@ class Comanda extends CI_Controller {
 	
 	public function Comandas(){
 
-		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.observacao, m.nome_mesa, cl.nome_cliente 
+		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.observacao, c.mesa, cl.nome_cliente 
         FROM comanda c 
-        LEFT JOIN mesa m ON (m.id_mesa = c.id_mesa)
         LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
-        where c.status = 1 order by c.data_comanda desc';
+        where c.status = 1 order by c.mesa asc';
 
 		$res = $this->Crud_model->Query($sql);
 		
@@ -104,21 +103,39 @@ class Comanda extends CI_Controller {
 			return;
 		else: 
 			$this->output->set_status_header('204');
-		endif;
-		
+		endif;		
 	}
 
-	public function NovaComanda(){
+	public function InserirComanda(){
 
+		$dataRegister = $this->input->post();
 		
-		if ($res):
-			$json = json_encode($res,JSON_UNESCAPED_UNICODE);
-			echo $json;
+		if ($dataRegister == null) {
+			$this->output->set_status_header('500');
 			return;
-		else: 
-			$this->output->set_status_header('204');
-		endif;
-		
+		}
+
+		$mesa = $dataRegister['mesa'];
+		$observacao = $dataRegister['observacao'];
+
+		$ref_comanda = rand(1,00000000000000);
+
+		$dataModel = array('mesa' => $mesa, 'observacao' => $observacao, 'ref_comanda' => $ref_comanda);
+		$res = $this->Crud_model->InsertID('comanda',$dataModel);
+		if ($res) {
+			$id = $res;
+			$dataModel = array('ref_comanda' => "CMD0".$id);
+			$res = $this->Crud_model->Update('comanda',$dataModel,array('id_comanda' => $id));
+			if($res) {
+				echo $id;
+				$this->output->set_status_header('200');
+				return;
+			}else {
+				$this->output->set_status_header('500');
+			}
+		}
+
+		$this->output->set_status_header('500');	
 	}
 
 	public function ComandaId(){
@@ -126,11 +143,27 @@ class Comanda extends CI_Controller {
 		$id = $this->uri->segment(5);
 		if ($id > 0):
 			
-			$res = $this->Crud_model->Read('comanda',array('id_comanda' => $this->uri->segment(5)));
+			$res = $this->Crud_model->Read('comanda',array('id_comanda' => $id));
 
 			if ($res):
 				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
 				echo $json;
+				return;
+			endif;
+		else:
+			$this->output->set_status_header('500');
+		endif;
+	}
+
+	public function ComandaRef(){
+
+		$ref = $this->uri->segment(5);
+		
+		if ($ref != ""):
+			
+			$res = $this->Crud_model->Read('comanda',array('ref_comanda' => $ref));
+			if ($res):
+				echo $res->id_comanda;
 				return;
 			endif;
 		else:
@@ -150,7 +183,7 @@ class Comanda extends CI_Controller {
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
 			INNER JOIN tabela_produto t ON (t.id_tabela_produto = cp.id_tabela_produto)
 			INNER JOIN tabela_preco tp ON (tp.id_tabela = t.id_tabela)
-			WHERE cp.fg_ativo = 1 AND c.id_comanda = $id ORDER BY cp.id_comanda_produto";
+			WHERE cp.fg_ativo = 1 AND cp.id_comanda = $id AND cat.id_categoria != 1 ORDER BY cp.id_comanda_produto";
 
 			$res = $this->Crud_model->Query($sql);
 			
@@ -239,7 +272,13 @@ class Comanda extends CI_Controller {
 			$dataObservacao .= "||Remoções: " . substr($obsTemp, 0, -2);
 		}
 
-		$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $id_produto, 'gerar_pedido' => $gerar_pedido, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto, 'observacao' => $dataObservacao."||Cliente: ".$observacao);
+		if ($observacao == "") {
+			$observacao = $dataObservacao;
+		}else {
+			$observacao = "Observações: ".$observacao.$dataObservacao;
+		}
+
+		$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $id_produto, 'gerar_pedido' => $gerar_pedido, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto, 'observacao' => $observacao);
 		$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
 		
 		if($res)  {	
