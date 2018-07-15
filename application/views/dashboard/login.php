@@ -6,13 +6,13 @@
   <div>
     <div class="w3-container w3-padding w3-display-middle w3-center" id="container-login">
       <div class="w3-row-padding">
-        <div class="w3-col l6">
+        <div class="w3-col l6" id="container-img">
           <div class="w3-display-container w3-text-white">
-            <div class="w3-center" style="width: 100%">
-              <img class="w3-image" width="250" style="transform: rotate(20deg)" src="<?=base_url("assets/img/icon.svg")?>">
-              <h1 style=""><b>LeCard</b></h1>
-              <p class="w3-large"><b>Uma Comanda virtual para seu negócio real</b></p>
-              <div class="w3-center w3-padding-16 w3-margin-top">
+            <div class="w3-center w3-padding-32" style="width: 100%;text-shadow: 0px 8px 9px rgb(0, 0, 0);">
+              <img class="w3-image" src="<?=base_url("assets/img/icon.svg")?>">
+              <h1><b>LeCard</b></h1>
+              <p class=""><b>Uma Comanda virtual para seu negócio real</b></p>
+              <div class="w3-center w3-padding-16 w3-margin-top w3-hide-large">
                 <button class="w3-button w3-block w3-hover-white" id="btn-login" onclick='$("#modal-login").css("display","block")'>LOGIN</button>
               </div>
             </div>

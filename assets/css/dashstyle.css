@@ -28,7 +28,7 @@
 }
 
 #btn-login{
-	display: none;
+	font-weight: 900;
 }
 
 @media (max-width: 600px) 
@@ -38,14 +38,18 @@
 		height: 100%;
 	}
 	#container-login{
-		width: 100%
+		width: 90%;
+		background-color: rgba(0,0,0,0.5);
+		border-radius: 4px;
+		box-shadow: 3px 10px 10px -5px rgba(0,0,0,0.75);
 	}
 	#card-login{
 		width: 100%;
 		margin-left: 0
 	}
 	#btn-login{
-		border: solid 1.5px #fff;
+		border-bottom: solid 1px #fff;
+		border-right: solid 1px #fff;
 		font-weight: bold;
 	}
 }
