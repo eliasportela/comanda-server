@@ -35,11 +35,7 @@
                     </div>
                     <div class="w3-col l2">
                         <label class="w3-margin-top"><b>Mesa</b></label>
-                        <select class="w3-select w3-border w3-white" name="id_mesa">
-                            <?php foreach($mesas as $mesa) {?>
-                                <option value="<?=$mesa->id_mesa?>" <?=($mesa->id_mesa == $comanda->id_mesa ? "selected" : "")?>><?=$mesa->nome_mesa?></option>
-                            <?php }?>
-                        </select>
+                        <input type="text" class="w3-input w3-border" name="id_mesa" value="<?=$comanda->mesa?>">
                     </div>
                     <div class="w3-col l7">
                         <label class="w3-margin-top"><b>Observações</b></label>

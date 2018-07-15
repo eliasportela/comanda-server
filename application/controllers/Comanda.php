@@ -34,9 +34,8 @@ class Comanda extends CI_Controller {
 		}
 
 		//sql busca
-		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, m.nome_mesa, cl.nome_cliente 
+		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.mesa as nome_mesa, cl.nome_cliente 
         FROM comanda c 
-        LEFT JOIN mesa m ON (m.id_mesa = c.id_mesa)
         LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
         where c.status = 1 and 1=1 and 1=1 order by c.data_comanda desc';
 
@@ -65,7 +64,6 @@ class Comanda extends CI_Controller {
 			if ($dataModel) {
 				
 				$data['comanda'] = $dataModel;
-				$data['mesas'] = $this->Crud_model->ReadAll('mesa');
 
 				$sql = "SELECT id_produto, nome_produto, ref_produto FROM produto WHERE fg_ativo = 1 AND id_categoria != 1";
 				$data['produtos'] = $this->Crud_model->Query($sql);

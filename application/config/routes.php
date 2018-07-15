@@ -32,7 +32,7 @@ $route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId';
 $route['admin/api/produtos-categoria/(:num)']['get'] = 'Produto/getProdutosCategoria';
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 $route['admin/api/produto']['post'] = 'Produto/Register';
-$route['admin/api/produto/editar/(:num)']['post'] = 'Produto/Edit';
+$route['admin/api/produto/editar']['post'] = 'Produto/Edit';
 $route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';
 
 #Produto Preço e Itens (id-produto/id-tabela)

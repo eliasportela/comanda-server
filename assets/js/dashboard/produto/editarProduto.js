@@ -6,39 +6,35 @@ jQuery(document).ready(function () {
 		getProdutoID(IDPRODUTO);
 	}
 
-	jQuery('#editarProdutor').submit(function () {
+	jQuery('#editarProduto').submit(function () {
 
-		if ($("#selectCidades").val() == 0) {
-			swal("", "Selecione a cidade do produtor", "warning");
+		var dadosajax = new FormData(this);
+		var pageurl = base_urla + 'admin/api/produto/editar';
 
-		} else {
-
-			var dadosajax = new FormData(this);
-			pageurl = base_urla + 'admin/api/produtor/editar/' + IDPRODUTO;
-
-			request("Salvando as alterações");
-			$.ajax({
-				url: pageurl,
-				type: 'POST',
-				data: dadosajax,
-				mimeType: "multipart/form-data",
-				contentType: false,
-				cache: false,
-				processData: false,
-				success: function (data, textStatus, jqXHR) {
-					requestSuccess();
-					swal({
-						title: '', text: 'Dados atualizados com sucesso!!', type: 'success'
-					}, function () {
-						location.reload();
-					});
-				},
-				error: function (jqXHR, textStatus, errorThrown) {
-					console.log(jqXHR);
-					requestSuccess();
-				}
-			});
-		}
+		request("Salvando as alterações");
+		$.ajax({
+			url: pageurl,
+			type: 'POST',
+			data: dadosajax,
+			mimeType:"multipart/form-data",
+			contentType: false,
+			cache: false,
+			processData:false,
+			success: function (data, textStatus, jqXHR) {
+				requestSuccess();
+				swal({
+					title: '', text: 'Dados atualizados com sucesso!!', type: 'success'
+				}, function () {
+					//console.log(jqXHR);
+					location.reload();
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				console.log(jqXHR);
+				requestSuccess();
+			}
+		});
+		
 
 		return false;
 	});
@@ -52,17 +48,22 @@ function getProdutoID(id) {
 	var url = base_urla + 'admin/api/produto/id/' + id;
 	var data = null;
 	var itens = null;
+	
 	var selector = $("#itens");
 	selector.empty();
+
+	var tabelaPrecos = $("#valores");	
+	tabelaPrecos.empty();
 
 	$.get(url, function (res) {
 		if (res) {
 			data = JSON.parse(res);
 			produto = data.produto;
 			itens = data.itens;
+			tabelas = data.valores;
 
 			$("#nome_produto").val(produto.nome_produto);
-			$("#categoria_produto").val(produto.id_categoria);
+			$("#id_categoria").val(produto.id_categoria);
 			$("#referencia").val(produto.ref_produto);
 
 		} else {
@@ -70,7 +71,7 @@ function getProdutoID(id) {
 		}
 	})
 		.done(function () {
-			if (itens != "") {
+			if (itens != null) {
 				itens.forEach(function (obj) {
 					var col = "";
 					col += "<td>" + obj.nome_produto + "</td>";
@@ -78,6 +79,17 @@ function getProdutoID(id) {
 					selector.append("<tr>" + col + "</tr>");
 				});
 			}
+
+			if (tabelas != null) {
+				tabelas.forEach(function (obj) {
+					var col = "";
+					col += "<td>" + obj.nome_tabela + "</td>";
+					col += "<td>" + obj.valor + "</td>";
+					col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
+					tabelaPrecos.append("<tr>" + col + "</tr>");
+				});
+			}
+
 		});
 }
 
@@ -110,7 +122,7 @@ function addItemTabela() {
 		$("#produtos :selected").text() +
 		'</td>';
 	col += '<td>' +
-		'<button class="w3-button w3-dark-gray w3-round" type="button" onclick="removeSafraPrevisao(' + ITEM + ')">' +
+		'<button class="w3-button w3-border w3-round" type="button" onclick="removeItemTabela(' + ITEM + ')">' +
 		'Remover' +
 		'</button>' +
 		'</td>';
@@ -128,44 +140,25 @@ function addPrecoTabela() {
 		$("#precos :selected").text() +
 		'</td>';
 	col += '<td>' +
-		'<input type="hidden" value="' + $("#precosValor").val() + '" class="w3-input w3-border" name="precos[]" required>' +
+		'<input type="hidden" value="' + $("#precosValor").val() + '" class="w3-input w3-border" name="valores[]" required>' +
 		$("#precosValor").val() +
 		'</td>';
 	col += '<td>' +
-		'<button class="w3-button w3-dark-gray w3-round" type="button" onclick="removeSafraPrevisao(' + ITEM + ')">' +
+		'<button class="w3-button w3-border w3-round" type="button" onclick="removePrecoTabela(' + PRECO + ')">' +
 		'Remover' +
 		'</button>' +
 		'</td>';
 	selPreco.append("<tr id='rowTabelaItens" + PRECO + "'>" + col + "</tr>");
 
+	$("#precos").val(1);
+	$("#precosValor").val("");
 	PRECO = PRECO + 1;
 }
 
-function removeSafraPrevisao(id) {
-	$("#rowSafraPre" + id).remove();
+function removeItemTabela(id) {
+	$("#rowTabelaItens" + id).remove();
 }
 
-function addSafraFechamento() {
-
-	var selector = $("#tabelaSafraFechamento");
-	var col = "";
-	col += '<td>' +
-		'<input type="number" value="2018" class="w3-input w3-border" name="safraFeAnoInicio[]" min="1900" max="2099" style="width: 45%;display: inline-block;margin-right:3px" required>' +
-		'<input type="number" value="2019" class="w3-input w3-border" name="safraFeAnoFim[]" min="1900" max="2099" style="width: 45%;display: inline-block" required>' +
-		'</td>';
-	col += '<td>' +
-		'<input type="number" class="w3-input w3-border" placeholder="Quantidade de sacas" name="safraFeQtd[]" required>' +
-		'</td>';
-	col += '<td>' +
-		'<button class="w3-button w3-border w3-round" type="button" onclick="removeSafraFechamento(' + SAFRAFE + ')">' +
-		'<i class="fa fa-times"></i> Remover' +
-		'</button>' +
-		'</td>';
-	selector.append("<tr id='rowSafraFe" + SAFRAFE + "'>" + col + "</tr>");
-
-	SAFRAFE = SAFRAFE + 1;
-}
-
-function removeSafraFechamento(id) {
-	$("#rowSafraFe" + id).remove();
+function removePrecoTabela(id) {
+	$("#rowTabelaItens" + id).remove();
 }

@@ -124,16 +124,30 @@ class Produto extends CI_Controller {
 				INNER JOIN produto p ON (p.id_produto = ip.id_produto_item) 
 				WHERE ip.id_produto = $ref";
 
-				$res = $this->Crud_model->Query($sql);
-				if ($res):
-					$itens = json_encode($res,JSON_UNESCAPED_UNICODE);
-					echo '{"produto":'.$json.',"itens":'.$itens.'}';
-					return;
-				else:
-					echo '{"produto":'.$json.',"itens":""}';
+				$resItens = $this->Crud_model->Query($sql);
+
+				$sql = "SELECT tp.id_tabela_produto, tp.id_tabela, t.nome_tabela, tp.valor
+					FROM tabela_produto tp
+					INNER JOIN produto p ON (p.id_produto = tp.id_produto)
+					INNER JOIN tabela_preco t ON (t.id_tabela = tp.id_tabela)
+					WHERE p.fg_ativo = 1 AND p.id_produto = $ref";
+
+				$resValores = $this->Crud_model->Query($sql);
+
+				$itens = "null";
+				$valores = "null";
+				if ($resItens):
+					$itens = json_encode($resItens,JSON_UNESCAPED_UNICODE);
 				endif;
 
+				if ($resValores):
+					$valores = json_encode($resValores,JSON_UNESCAPED_UNICODE);
+				endif;
+
+				echo '{"produto":'.$json.',"itens":'.$itens.',"valores":'.$valores.'}';
+
 				return;
+
 			endif;
 		else:
 			$this->output->set_status_header('500');
@@ -245,82 +259,44 @@ class Produto extends CI_Controller {
 		if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
 
 			$dataRegister = $this->input->post();
+			if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
 
-			$dataId = (int)$this->uri->segment(5);
+				
+				$id_produto = trim($dataRegister['id_produto']);
+				$nome_produto = trim($dataRegister['nome_produto']);
+				$id_categoria = trim($dataRegister['id_categoria']);
+				$referencia = trim($dataRegister['referencia']);
 
-			if ($dataRegister AND $dataId > 0):
-
-			//Config ambiente de upload
-				$path = './uploads/docs/'.$dataId.'/';
-				$config['upload_path'] = $path;
-				$config['allowed_types'] = 'pdf|jpg|jpeg|png';
-				$config['max_size'] = '5000';
-				$config['encrypt_name']  = TRUE;
-				$this->upload->initialize($config);
-
-			//verifica se o path é válido, se não for cria o diretório
-				if (!is_dir($path)) {
-					mkdir($path, 0777, $recursive = true);
-				}
-
-				if (!$this->upload->do_upload('foto_file')) {
-					$foto_name = false;
-				} else {
-					$dadosImagem = $this->upload->data();
-					$foto_name = $dadosImagem['file_name'];
-				}
-
-				if (!$this->upload->do_upload('comprovante_file')) {
-					$comprovante_name = false;
-				} else {
-					$dadosImagem = $this->upload->data();
-					$comprovante_name = $dadosImagem['file_name'];
-				}
+				//die(var_dump($dataRegister['produtos']));
 
 				$dataModel = array(
-					'nome_produto' => trim($dataRegister['nome_produto']),
-					'id_categoria' => trim($dataRegister['id_categoria']),
-					'cpf_cnpj' => trim($dataRegister['cpf_cnpj']),
-					'rg_inscricao_estadual' => trim($dataRegister['rg_inscricao_estadual']),
-					'data_nascimento' => trim($dataRegister['data_nascimento']),
-					'escolaridade' => trim($dataRegister['escolaridade']),
-					'membros_familia' => trim($dataRegister['membros_familia']),
-					'email' => trim($dataRegister['email']),
-					'telefone' => trim($dataRegister['telefone']),
-					'endereco' => trim($dataRegister['endereco']),
-					'numero' => trim($dataRegister['numero']),
-					'complemento' => trim($dataRegister['complemento']),
-					'cep' => trim($dataRegister['cep']),
-					'bairro' => trim($dataRegister['bairro']),
-					'id_cidade' => trim($dataRegister['id_cidade']),
-					'certificados' => trim($dataRegister['certificados']));
+					'nome_produto' => $nome_produto,
+					'id_categoria' => $id_categoria,
+					'ref_produto' => $referencia);
 
-			//caso mudou a img exclui a anterior
-				$sql = "SELECT foto_produto, comprovante_bancario FROM produto WHERE id_produto = $dataId";
-				$upload = $this->Crud_model->Query($sql);
+				$res = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $id_produto));
 
-				if ($foto_name) {
-					$dataModel = array_merge($dataModel,array('foto_produto' => $foto_name));
-					if ($upload) {
-						unlink($path.$upload[0]->foto_produto);
-					}
-				}
-				if ($comprovante_name) {
-					$dataModel = array_merge($dataModel,array('comprovante_bancario' => $comprovante_name));
-					if ($upload) {
-						unlink($path.$upload[0]->comprovante_bancario);
-					}
-				}
+				if($res):					
 
+					if(isset($dataRegister['produtos'])):
+						for ($i=0; $i < count($dataRegister['produtos']); $i++) {
+							$produtoModel = array('id_produto' => $id_produto, 'id_produto_item' => $dataRegister['produtos'][$i]);
+							$res = $this->Crud_model->Insert('item_produto',$produtoModel);
+						}
+					endif;
 
-				$res = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $dataId));
+					if(isset($dataRegister['precos'])):
+						for ($i=0; $i < count($dataRegister['precos']); $i++) {
+							$tabelaModel = array('id_produto' => $id_produto, 
+								'id_tabela' => $dataRegister['precos'][$i],
+								'valor' => $dataRegister['valores'][$i]);
+							$res = $this->Crud_model->Insert('tabela_produto',$tabelaModel);
+						}
+					endif;
 
-				if($res):
-					echo $res;
 					$this->output->set_status_header('200');
 					return;
 				endif;
-
 			endif;
 		else:
 			$this->output->set_status_header('400');

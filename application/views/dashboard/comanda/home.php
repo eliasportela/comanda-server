@@ -73,7 +73,7 @@
               <td class="w3-opacity"><?=$comanda->data_comanda.' às '.$comanda->hora_comanda?></td>
               <td><?=$comanda->ref_comanda?></td>
               <td><?=($comanda->tipo_comanda == 1 ? "Mesa" : "Viagem")?></td>
-              <td><?=($comanda->nome_mesa != null ? $comanda->nome_mesa : $comanda->nome_cliente)?></td>
+              <td><?=($comanda->nome_mesa != null ? 'Mesa ' . $comanda->nome_mesa : $comanda->nome_cliente)?></td>
             </tr>
             <?php endforeach; endif; ?>
             </table>
