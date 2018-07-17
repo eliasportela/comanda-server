@@ -5,6 +5,28 @@ header('Access-Control-Allow-Origin: *');
 
 class Pedido extends CI_Controller {
 
+	public function index(){
+
+		//sql busca
+		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.mesa as nome_mesa, cl.nome_cliente 
+        FROM comanda c 
+        LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
+        where c.status = 1 and 1=1 and 1=1 order by c.data_comanda desc';
+
+		$data['comandas'] = $this->Crud_model->Query($sql);
+        
+        //$sql = "SELECT count(*) as qtd FROM contato where $visualizado";
+		//$data['qtd'] = $this->Crud_model->Query($sql);
+
+		$menu['id_page'] = 2;
+		$header['title'] = 'Dash | Pedido';
+		$header['page'] = '1';
+
+        $this->load->view('dashboard/template/commons/header',$header);
+        $this->load->view('dashboard/pedido/home',$data);
+		$this->load->view('dashboard/template/commons/footer');
+	}
+
 	public function PedidosComanda(){
 
 		$comanda = $this->uri->segment(4);

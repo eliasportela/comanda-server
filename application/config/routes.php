@@ -53,6 +53,7 @@ $route['admin/api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 $route['admin/api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
 
 //Pedido
+$route['admin/pedidos']['get'] = 'Pedido';
 $route['admin/api/pedidos-comanda/(:num)']['get'] = 'Pedido/PedidosComanda';
 
 $route['admin/api/cardapio/(:num)']['get'] = 'Cardapio/ListarCardapio';
