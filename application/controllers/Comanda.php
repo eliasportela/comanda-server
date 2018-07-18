@@ -240,6 +240,10 @@ class Comanda extends CI_Controller {
 		$quantidade = $dataRegister['quantidade'];
 		$id_tabela_produto = $dataRegister['id_tabela_produto'];
 		$observacao = $dataRegister['observacao'];
+		$status_pedido = 0;
+		if ($gerar_pedido == 1) {
+			$status_pedido = 1;
+		}
 
 		$dataObservacao = "";
 
@@ -250,7 +254,7 @@ class Comanda extends CI_Controller {
 				$adsProduto = explode('||', $ads);
 				$adsId = $adsProduto[0];
 				$adsTabela = $adsProduto[1];
-				$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_produto' => $adsTabela);
+				$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_produto' => $adsTabela,'status_pedido' => $status_pedido);
 				$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
 				
 				if ($res) {
@@ -258,7 +262,7 @@ class Comanda extends CI_Controller {
 					$obsTemp .= $dataAds->nome_produto . ", ";
 				}
 			}
-			$dataObservacao .= "||Adicionais: " . substr($obsTemp, 0, -2);
+			$dataObservacao .= "Adicionais: " . substr($obsTemp, 0, -2) ."||";
 		}
 
 		$remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
@@ -267,18 +271,21 @@ class Comanda extends CI_Controller {
 			foreach ($remocoes as $obs) {
 				$obsTemp .= $obs . ", ";
 			}
-			$dataObservacao .= "||Remoções: " . substr($obsTemp, 0, -2);
+			$dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) ."||";
 		}
 
-		if ($observacao == "") {
-			$observacao = $dataObservacao;
+
+		if ($observacao != "") {
+			$observacao = $observacao."||".$dataObservacao;
 		}else {
-			$observacao = "Observações: ".$observacao.$dataObservacao;
+			$observacao = $dataObservacao;
 		}
+
+		$observacao = substr($observacao, 0, -2);
 
 		$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $id_produto, 'gerar_pedido' => $gerar_pedido, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto, 'observacao' => $observacao);
 		$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
-		
+		//$res = true;
 		if($res)  {	
 			$this->output->set_status_header('200');
 		}else {
