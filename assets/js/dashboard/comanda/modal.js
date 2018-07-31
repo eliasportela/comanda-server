@@ -1,10 +1,60 @@
 $(document).ready(function () {
     buscarProdutosCategoria();
+
+    $('#inserirProdutos').submit(function () {
+
+        if ($("#id_produto1").val() > 0 || $("#id_produto2").val() > 0) {
+            swal("", "Selecione a cidade do produtor", "warning");
+
+        } else {
+
+            var dadosajax = {
+                'id_comanda':1,
+                'id_produto':1,
+                'gerar_pedido':1,
+                'quantidade':1,
+                'id_tabela_produto':1,
+                'observacao':1,
+                'produtos'
+            };
+
+            pageurl = base_urla + 'admin/api/produto';
+
+            request("Salvando as alterações");
+            $.ajax({
+                url: pageurl,
+                type: 'POST',
+                data: dadosajax,
+                mimeType: "multipart/form-data",
+                contentType: false,
+                cache: false,
+                processData: false,
+                success: function (data, textStatus, jqXHR) {
+                    requestSuccess();
+                    swal({
+                        title: '', text: 'Dados atualizados com sucesso!!', type: 'success'
+                    }, function () {
+                        location.reload();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log(jqXHR);
+                    requestSuccess();
+                }
+            });
+        }
+
+        return false;
+    });
+
 });
 
 var SELITENSREMOCAO1 = [];
 var SELITENSREMOCAO2 = [];
 var SELITENSREMOCAO = [];
+
+var ITENSREMOCAO = [];
+var ITENSADICIONAIS = [];
 
 function buscarProdutosCategoria() {
     var id = $("#categoria_produto").val();
@@ -27,7 +77,7 @@ function buscarProdutosCategoria() {
         }
     }).done(function () {
         option.empty();
-        option.append("<option>Selecione um Produto</option>");
+        option.append("<option value='0'>Selecione um Produto</option>");
         if (data !== null) {
             data.forEach(function (obj) {
                 var eloption = $("<option>");
@@ -110,6 +160,52 @@ function buscarProdutosRemocoes(id) {
 
         }
     });
+
+}
+
+function addRemocoes() {
+
+    var id = $("#remocoesProduto").val();
+    var nome = $("#remocoesProduto").find("option:selected").text();
+
+    if (!ITENSREMOCAO.includes(id)) {
+
+        ITENSREMOCAO.push(id);
+
+        var tr = $("<tr>");
+        var td1 = $("<td>");
+        var td2 = $("<td>");
+
+        td1.append(nome);
+        td2.append("<input type='hidden' value='"+ id +"' /><button class='w3-button' type='button' onclick='removerRemocao(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
+
+        tr.append(td1).append(td2);
+        $("#tabelaRemocoes").append(tr);
+
+    }
+
+}
+
+function addAdicionais() {
+
+    var id = $("#adicionaisProduto").val();
+    var nome = $("#adicionaisProduto").find("option:selected").text();
+
+    if (!ITENSADICIONAIS.includes(id) && ($("#id_produto1").val() > 0 || $("#id_produto2").val() > 0 )) {
+
+        ITENSADICIONAIS.push(id);
+
+        var tr = $("<tr>");
+        var td1 = $("<td>");
+        var td2 = $("<td>");
+
+        td1.append(nome);
+        td2.append("<input type='hidden' value='"+ id +"'/><button class='w3-button' type='button' onclick='removerAdicionais(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
+
+        tr.append(td1).append(td2);
+        $("#tabelaAdicionais").append(tr);
+
+    }
 
 }
 

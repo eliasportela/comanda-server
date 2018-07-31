@@ -8,7 +8,7 @@
 </style>
 <div id="modalProduto" class="w3-modal">
     <div class="w3-modal-content modal w3-card-4 w3-animate-left" style="margin-top: 60px">
-        <form method="POST" action="" id="inserirProduto">
+        <form method="POST" action="" id="inserirProdutos">
             <div class="w3-container w3-padding-16 w3-large w3-border-bottom">
                 <i class="fa fa-tag"></i> <span id="titleProduto">Inserir Produto</span>
                 <span class="w3-right" onclick="toogleModalProduto(0)" style="cursor: pointer;"><i class="fa fa-times"></i></span>
@@ -56,7 +56,7 @@
                             </div>
                             <div class="w3-col m3" style="padding-left: 2px">
                                 <label class="w3-margin-top invisivel"><b>A</b></label>
-                                <button class="w3-button w3-dark-gray w3-block" style="height: 40px"><i class="fa fa-plus"></i></button>
+                                <button class="w3-button w3-dark-gray w3-block" type='button' onclick="addRemocoes()" style="height: 40px"><i class="fa fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="w3-margin-top" style="height: 200px">
@@ -65,15 +65,7 @@
                                     <th style="width: 80%">Produto</th>
                                     <th style="width: 20%"></th>
                                 </tr>
-                                <tbody>
-                                <tr>
-                                    <td>Milho</td>
-                                    <td>
-                                        <button class="w3-button">
-                                            <i class="fa fa-trash-o w3-text-red"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                <tbody id="tabelaRemocoes">
                                 </tbody>
                             </table>
                         </div>
@@ -88,7 +80,7 @@
                             </div>
                             <div class="w3-col m3" style="padding-left: 2px">
                                 <label class="w3-margin-top invisivel"><b>A</b></label>
-                                <button class="w3-button w3-dark-gray w3-block" style="height: 40px"><i class="fa fa-plus"></i></button>
+                                <button class="w3-button w3-dark-gray w3-block" type="button" onclick="addAdicionais()" style="height: 40px"><i class="fa fa-plus"></i></button>
                             </div>
                         </div>
                         <div class="w3-margin-top" style="height: 200px">
@@ -97,15 +89,7 @@
                                     <th style="width: 80%">Produto</th>
                                     <th style="width: 20%"></th>
                                 </tr>
-                                <tbody>
-                                <tr>
-                                    <td>Milho</td>
-                                    <td>
-                                        <button class="w3-button">
-                                            <i class="fa fa-trash-o w3-text-red"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                <tbody id="tabelaAdicionais">
                                 </tbody>
                             </table>
                         </div>
