@@ -15,7 +15,7 @@ $(document).ready(function () {
                 'quantidade':1,
                 'id_tabela_produto':1,
                 'observacao':1,
-                'produtos'
+                'produtos':1
             };
 
             pageurl = base_urla + 'admin/api/produto';

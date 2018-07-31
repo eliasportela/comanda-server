@@ -230,21 +230,39 @@ class Comanda extends CI_Controller {
 		}
 
 		//die(var_dump($dataRegister));
-
 		$id_comanda = $dataRegister['id_comanda'];
-		$id_produto = $dataRegister['id_produto'];
-		$gerar_pedido = $dataRegister['gerar_pedido'];
-		$quantidade = $dataRegister['quantidade'];
-		$id_tabela_produto = $dataRegister['id_tabela_produto'];
-		$observacao = $dataRegister['observacao'];
-		$status_pedido = 0;
-		if ($gerar_pedido == 1) {
-			$status_pedido = 1;
-		}
+        $gerar_pedido = $dataRegister['gerar_pedido'];
+        $quantidade = $dataRegister['quantidade'];
+        $observacao = $dataRegister['observacao'];
+        $status_pedido = 0;
 
-		$dataObservacao = "";
+        if ($gerar_pedido == 1) {
+            $status_pedido = 1;
+        }
 
-		$adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
+        $id_tabela_produto = $dataRegister['id_tabela_produto'];
+        $id_produto = [];
+
+        $dataObservacao = "";
+        $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
+        if ($produtos != null && count($produtos) > 1) {
+            $produtoGenerico = 15;
+            foreach ($produtos as $p) {
+
+                //TODO Verificar o produto com a tabela de preço maior
+                
+                $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $produtoGenerico, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto,'status_pedido' => $status_pedido);
+                $res = $this->Crud_model->Insert('comanda_produto',$dataModel);
+
+                if ($res) {
+                    $data = $this->Crud_model->Read('produto',array('id_produto' => $p));
+                    $dataObservacao .= "1/2 " . $data->nome_produto . "||";
+                }
+            }
+        } else if (count($produtos) == 1){
+        }
+
+        $adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
 		if ($adicionais != null) {
 			$obsTemp = "";
 			foreach ($adicionais as $ads) {
