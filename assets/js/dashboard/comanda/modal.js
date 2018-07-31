@@ -56,6 +56,10 @@ var SELITENSREMOCAO = [];
 var ITENSREMOCAO = [];
 var ITENSADICIONAIS = [];
 
+var VALORESPRODUTO1 = [];
+var VALORESPRODUTO2 = [];
+var VALORESPRODUTOS = []
+
 function buscarProdutosCategoria() {
     var id = $("#categoria_produto").val();
     var url = base_urla + 'admin/api/produtos-categoria/' + id;
@@ -77,23 +81,23 @@ function buscarProdutosCategoria() {
         }
     }).done(function () {
         option.empty();
-        option.append("<option value='0'>Selecione um Produto</option>");
         if (data !== null) {
             data.forEach(function (obj) {
                 var eloption = $("<option>");
                 eloption.val(obj.id_produto).html(obj.nome_produto);
                 option.append(eloption);
             });
+            buscarProduto('1');
         }
     });
 }
 
 function mudarTipoPizza() {
     if ($("#tipo_pizza").val() === "1"){
-        $("#baseProduto1").removeClass("m6").addClass("m3");
+        $("#baseProduto1").removeClass("m4").addClass("m2");
         $("#baseProduto2").removeClass("w3-hide");
     }else {
-        $("#baseProduto1").removeClass("m3").addClass("m6");
+        $("#baseProduto1").removeClass("m2").addClass("m4");
         $("#baseProduto2").addClass("w3-hide");
     }
 }
@@ -122,12 +126,15 @@ function buscarProdutosAdicionais() {
 
 }
 
-function buscarProdutosRemocoes(id) {
+function buscarProduto(id) {
 
     var produto = $("#id_produto" + id).val();
     var url = base_urla + 'admin/api/produto/id/' + produto;
     var data = null;
+
+    //Remocoes
     var option = $("#remocoesProduto");
+    var optTabelas = $("#tabelasProduto");
 
     $.get(url, function (res) {
         if (res) {
@@ -137,6 +144,7 @@ function buscarProdutosRemocoes(id) {
         option.empty();
         if (data.itens !== null) {
 
+            //add Remocoes
             var itens = [];
             data.itens.forEach(function (obj) {
                 var s = JSON.stringify(obj);
@@ -157,6 +165,27 @@ function buscarProdutosRemocoes(id) {
                 eloption.val(obj.id_produto).html(obj.nome_produto);
                 option.append(eloption);
             });
+
+
+            //add Tabela de preços
+            var tabelas = [];
+            data.valores.forEach(function (obj) {        
+                tabelas.push(obj);
+            });            
+
+            if (id === '1'){
+                VALORESPRODUTO1 = tabelas;
+            } else {
+                VALORESPRODUTO2 = tabelas;
+            }
+
+            VALORESPRODUTOS = VALORESPRODUTO1.concat(VALORESPRODUTO2);
+
+            console.log(VALORESPRODUTOS);
+
+            // var elOptTabelas = $("<option>");
+            // elOptTabelas.val(obj.id_tabela_preco).html(obj.nome_tabela +' - R$'+ obj.valor);
+            // optTabelas.append(elOptTabelas);
 
         }
     });
@@ -210,6 +239,16 @@ function addAdicionais() {
 }
 
 function unique(list) {
+    var result = [];
+    list.forEach(function (value) {
+       if (!result.includes(value)){
+           result.push(value);
+       }
+    });
+    return result;
+}
+
+function regraValorMaior(list) {
     var result = [];
     list.forEach(function (value) {
        if (!result.includes(value)){

@@ -171,13 +171,13 @@ class Comanda extends CI_Controller {
 		$id = $this->uri->segment(4);
 		if ($id > 0):
 			
-			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, t.valor, tp.nome_tabela
+			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, cp.valor_produto, tp.nome_tabela
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
-			INNER JOIN tabela_produto t ON (t.id_tabela_produto = cp.id_tabela_produto)
-			INNER JOIN tabela_preco tp ON (tp.id_tabela = t.id_tabela)
+			INNER JOIN tabela_preco t ON (t.id_tabela_preco = cp.id_tabela_preco)
+			INNER JOIN tabela_produto tp ON (tp.id_tabela = t.id_tabela)
 			WHERE cp.fg_ativo = 1 AND cp.id_comanda = $id AND cat.id_categoria != 1 ORDER BY cp.id_comanda_produto";
 
 			$res = $this->Crud_model->Query($sql);

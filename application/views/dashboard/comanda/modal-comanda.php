@@ -3,7 +3,7 @@
         padding-top: 0;
     }
     #modalProduto .modal {
-        width: 90% !important;
+        width: 95% !important;
     }
 </style>
 <div id="modalProduto" class="w3-modal">
@@ -30,14 +30,20 @@
                             <option value="1">1/2 a 1/2</option>
                         </select>
                     </div>
-                    <div class="w3-col m6" id="baseProduto1">
+                    <div class="w3-col m4" id="baseProduto1">
                         <label for="id_produto1">Produto</label>
-                        <select class="w3-select w3-border w3-white produtos" id="id_produto1" onchange="buscarProdutosRemocoes('1')">
+                        <select class="w3-select w3-border w3-white produtos" id="id_produto1" onchange="buscarProduto('1')">
                         </select>
                     </div>
-                    <div class="w3-col m3 w3-hide" id="baseProduto2">
+                    <div class="w3-col m2 w3-hide" id="baseProduto2">
                         <label for="id_produto2">Produto</label>
-                        <select class="w3-select w3-border w3-white produtos" id="id_produto2" onchange="buscarProdutosRemocoes('2')">
+                        <select class="w3-select w3-border w3-white produtos" id="id_produto2" onchange="buscarProduto('2')">
+                        </select>
+                    </div>
+                    <div class="w3-col m2">
+                        <label for="tipo_pizza">Tabela/Preço</label>
+                        <select class="w3-select w3-border w3-white" id="tabelasProduto" name="tabelasProduto">
+                            <option value="0">Selecione um Produto</option>
                         </select>
                     </div>
                     <div class="w3-col m2">

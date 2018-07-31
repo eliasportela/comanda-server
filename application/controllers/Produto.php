@@ -126,10 +126,10 @@ class Produto extends CI_Controller {
 
 				$resItens = $this->Crud_model->Query($sql);
 
-				$sql = "SELECT tp.id_tabela_produto, tp.id_tabela, t.nome_tabela, tp.valor
-					FROM tabela_produto tp
+				$sql = "SELECT tp.id_tabela_preco, tp.id_tabela, t.nome_tabela, tp.valor
+					FROM tabela_preco tp
 					INNER JOIN produto p ON (p.id_produto = tp.id_produto)
-					INNER JOIN tabela_preco t ON (t.id_tabela = tp.id_tabela)
+					INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
 					WHERE p.fg_ativo = 1 AND p.id_produto = $ref";
 
 				$resValores = $this->Crud_model->Query($sql);
