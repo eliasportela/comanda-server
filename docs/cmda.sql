@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Tempo de geração: 15/07/2018 às 18:51
+-- Tempo de geração: 31/07/2018 às 08:55
 -- Versão do servidor: 5.7.21-0ubuntu0.16.04.1
 -- Versão do PHP: 7.0.25-0ubuntu0.16.04.1
 
@@ -29,7 +29,6 @@ SET time_zone = "+00:00";
 CREATE TABLE `categoria_produto` (
   `id_categoria` int(11) NOT NULL,
   `nome_categoria` varchar(80) NOT NULL,
-  `gerar_pedido` int(11) NOT NULL DEFAULT '1',
   `pizza` int(11) NOT NULL DEFAULT '0',
   `fg_ativo` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -38,11 +37,10 @@ CREATE TABLE `categoria_produto` (
 -- Fazendo dump de dados para tabela `categoria_produto`
 --
 
-INSERT INTO `categoria_produto` (`id_categoria`, `nome_categoria`, `gerar_pedido`, `pizza`, `fg_ativo`) VALUES
-(1, 'Adicionais', 0, 0, 1),
-(2, 'Pizzas', 1, 1, 1),
-(3, 'Pizzas Italianas', 1, 1, 1),
-(4, 'Pizzas de Época', 1, 1, 1);
+INSERT INTO `categoria_produto` (`id_categoria`, `nome_categoria`, `pizza`, `fg_ativo`) VALUES
+(1, 'Adicionais', 0, 1),
+(2, 'Pizza', 1, 1),
+(3, 'Bebidas', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -115,10 +113,10 @@ CREATE TABLE `comanda_produto` (
   `id_comanda_produto` int(11) NOT NULL,
   `id_comanda` int(11) NOT NULL,
   `id_produto` int(11) NOT NULL,
-  `gerar_pedido` int(11) NOT NULL DEFAULT '0',
   `data_pedido` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `status_pedido` int(11) NOT NULL DEFAULT '1',
   `quantidade` decimal(10,1) NOT NULL,
+  `valor_produto` decimal(10,2) NOT NULL,
   `id_tabela_produto` int(11) NOT NULL,
   `observacao` text,
   `fg_ativo` int(11) NOT NULL DEFAULT '1'
@@ -128,14 +126,10 @@ CREATE TABLE `comanda_produto` (
 -- Fazendo dump de dados para tabela `comanda_produto`
 --
 
-INSERT INTO `comanda_produto` (`id_comanda_produto`, `id_comanda`, `id_produto`, `gerar_pedido`, `data_pedido`, `status_pedido`, `quantidade`, `id_tabela_produto`, `observacao`, `fg_ativo`) VALUES
-(41, 1, 12, 1, '2018-07-14 16:03:24', 2, '1.0', 1, NULL, 1),
-(42, 1, 3, 0, '2018-07-14 20:44:59', 1, '1.0', 7, NULL, 1),
-(43, 1, 4, 0, '2018-07-14 20:44:59', 1, '1.0', 8, NULL, 1),
-(44, 1, 5, 0, '2018-07-14 20:44:59', 1, '1.0', 9, NULL, 1),
-(45, 1, 12, 1, '2018-07-14 20:44:59', 1, '1.0', 1, 'Observações: ||Adicionais: Catupiry, Milho, Presunto||Remoções: S/ Tomate', 1),
-(46, 5, 4, 0, '2018-07-15 15:43:06', 1, '1.0', 8, NULL, 1),
-(47, 5, 32, 1, '2018-07-15 15:43:07', 1, '2.0', 17, '||Adicionais: Milho||Remoções: S/ Cebola', 1);
+INSERT INTO `comanda_produto` (`id_comanda_produto`, `id_comanda`, `id_produto`, `data_pedido`, `status_pedido`, `quantidade`, `valor_produto`, `id_tabela_produto`, `observacao`, `fg_ativo`) VALUES
+(62, 4, 4, '2018-07-18 00:04:13', 1, '1.0', '0.00', 8, NULL, 1),
+(63, 4, 15, '2018-07-18 00:04:13', 1, '1.0', '0.00', 12, 'Adicionais: Milho||Remoções: S/ Tomate', 1),
+(64, 4, 16, '2018-07-18 00:04:47', 1, '1.0', '0.00', 13, 'Remoções: S/ Cebola', 1);
 
 -- --------------------------------------------------------
 
@@ -177,7 +171,9 @@ INSERT INTO `item_produto` (`id_produto`, `id_produto_item`) VALUES
 (32, 5),
 (32, 11),
 (32, 3),
-(32, 6);
+(32, 6),
+(19, 9),
+(19, 10);
 
 -- --------------------------------------------------------
 
@@ -190,6 +186,7 @@ CREATE TABLE `produto` (
   `nome_produto` varchar(200) NOT NULL,
   `ref_produto` varchar(200) NOT NULL,
   `id_categoria` int(11) NOT NULL,
+  `gerar_pedido` int(1) NOT NULL DEFAULT '1',
   `fg_ativo` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -197,36 +194,38 @@ CREATE TABLE `produto` (
 -- Fazendo dump de dados para tabela `produto`
 --
 
-INSERT INTO `produto` (`id_produto`, `nome_produto`, `ref_produto`, `id_categoria`, `fg_ativo`) VALUES
-(1, 'Mozzarella', '1001', 1, 1),
-(2, 'Tomate', '1002', 1, 1),
-(3, 'Catupiry', '1003', 1, 1),
-(4, 'Milho', '1004', 1, 1),
-(5, 'Presunto', '1005', 1, 1),
-(6, 'Cebola', '1006', 1, 1),
-(7, 'Azeitonas Verdes', '1007', 1, 1),
-(8, 'Chedder', '1008', 1, 1),
-(9, 'Calabresa', '1009', 1, 1),
-(10, 'Pimenta Calabresa', '1010', 1, 1),
-(11, 'Parmesão', '1011', 1, 1),
-(12, 'Mozzarella', '01', 2, 1),
-(13, 'Mozzarella c/ Catupiry', '02', 2, 1),
-(14, 'Mozzarella c/ Milho e Catupiry', '03', 2, 1),
-(15, 'Bauru', '04', 2, 1),
-(16, 'Bauru c/ Catupiry', '05', 2, 1),
-(17, 'Bauru c/ Chedder', '06', 2, 1),
-(18, 'Calabresa Mineira', '07', 2, 1),
-(19, 'Calabresa Baiana', '08', 2, 1),
-(20, 'Calabresa Paulista', '09', 2, 1),
-(21, 'Calacatu', '10', 2, 1),
-(22, 'Ervilha', 'r1', 1, 1),
-(24, 'Ovos', 'r3', 1, 1),
-(25, 'Palmito', 'r6', 1, 1),
-(27, 'Lombo Canadense', 'r10', 1, 1),
-(29, 'Bacon', 'r937372', 1, 1),
-(30, 'Peito de Frango Desfiado', 'R171934', 1, 1),
-(31, 'Provolone', 'R393223', 1, 1),
-(32, 'Napolitana', '11', 2, 1);
+INSERT INTO `produto` (`id_produto`, `nome_produto`, `ref_produto`, `id_categoria`, `gerar_pedido`, `fg_ativo`) VALUES
+(1, 'Mozzarella', '1001', 1, 1, 1),
+(2, 'Tomate', '1002', 1, 1, 1),
+(3, 'Catupiry', '1003', 1, 1, 1),
+(4, 'Milho', '1004', 1, 1, 1),
+(5, 'Presunto', '1005', 1, 1, 1),
+(6, 'Cebola', '1006', 1, 1, 1),
+(7, 'Azeitonas Verdes', '1007', 1, 1, 1),
+(8, 'Chedder', '1008', 1, 1, 1),
+(9, 'Calabresa', '1009', 1, 1, 1),
+(10, 'Pimenta Calabresa', '1010', 1, 1, 1),
+(11, 'Parmesão', '1011', 1, 1, 1),
+(12, 'Mozzarella', '01', 2, 1, 1),
+(13, 'Mozzarella c/ Catupiry', '02', 2, 1, 1),
+(14, 'Mozzarella c/ Milho e Catupiry', '03', 2, 1, 1),
+(15, 'Bauru', '04', 2, 1, 1),
+(16, 'Bauru c/ Catupiry', '05', 2, 1, 1),
+(17, 'Bauru c/ Chedder', '06', 2, 1, 1),
+(18, 'Calabresa Mineira', '07', 2, 1, 1),
+(19, 'Calabresa Baiana', '08', 2, 1, 1),
+(20, 'Calabresa Paulista', '09', 2, 1, 1),
+(21, 'Calacatu', '10', 2, 1, 1),
+(22, 'Ervilha', 'r1', 1, 1, 1),
+(24, 'Ovos', 'r3', 1, 1, 1),
+(25, 'Palmito', 'r6', 1, 1, 1),
+(27, 'Lombo Canadense', 'r10', 1, 1, 1),
+(29, 'Bacon', 'r937372', 1, 1, 1),
+(30, 'Peito de Frango Desfiado', 'R171934', 1, 1, 1),
+(31, 'Provolone', 'R393223', 1, 1, 1),
+(32, 'Napolitana', '11', 2, 1, 1),
+(33, 'Portuguesa', 'R033', 2, 1, 1),
+(35, 'Lombinho', 'R035', 2, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -285,7 +284,9 @@ INSERT INTO `tabela_produto` (`id_tabela_produto`, `id_produto`, `id_tabela`, `v
 (15, 18, 3, '30.00'),
 (16, 18, 2, '20.00'),
 (17, 32, 3, '30.00'),
-(18, 32, 2, '20.00');
+(18, 32, 2, '20.00'),
+(19, 19, 2, '20.00'),
+(20, 19, 3, '30.00');
 
 -- --------------------------------------------------------
 
@@ -392,7 +393,7 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de tabela `categoria_produto`
 --
 ALTER TABLE `categoria_produto`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT de tabela `cidade`
 --
@@ -412,12 +413,12 @@ ALTER TABLE `comanda`
 -- AUTO_INCREMENT de tabela `comanda_produto`
 --
 ALTER TABLE `comanda_produto`
-  MODIFY `id_comanda_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id_comanda_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 --
 -- AUTO_INCREMENT de tabela `produto`
 --
 ALTER TABLE `produto`
-  MODIFY `id_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 --
 -- AUTO_INCREMENT de tabela `tabela_preco`
 --
@@ -427,7 +428,7 @@ ALTER TABLE `tabela_preco`
 -- AUTO_INCREMENT de tabela `tabela_produto`
 --
 ALTER TABLE `tabela_produto`
-  MODIFY `id_tabela_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_tabela_produto` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 --
 -- AUTO_INCREMENT de tabela `usuario`
 --
