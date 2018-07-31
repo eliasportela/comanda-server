@@ -4,7 +4,7 @@ jQuery(document).ready(function(){
 	jQuery('#inserirProduto').submit(function(){
 
 		var dadosajax = new FormData(this);
-		pageurl = base_urla + 'admin/api/produto';
+		var pageurl = base_urla + 'admin/api/produto';
 		
 		request("Salvando as informações");
 
@@ -16,9 +16,8 @@ jQuery(document).ready(function(){
 			contentType: false,
 			cache: false,
 			processData:false,
-			success: function(data, textStatus, jqXHR)
+			success: function(data)
 			{
-
 				requestSuccess();
 				swal({
 					title: '',text: 'Dados inseridos com sucesso!!',type: 'success'
@@ -27,7 +26,7 @@ jQuery(document).ready(function(){
 				});
 				
 			},
-			error: function(jqXHR, textStatus, errorThrown) 
+			error: function(jqXHR)
 			{
 				console.log(jqXHR);
 				requestSuccess();
@@ -39,16 +38,3 @@ jQuery(document).ready(function(){
 	});
 
 });
-
-
-//Toogle Disable input gerarReferencia 
-function toogleGerarReferencia(){
-	var tipo = $("#gerar-referencia").val();
-	if (tipo == 1) {
-		$("#referencia").val("");
-		$("#referencia").prop("disabled","true");
-	}
-	else{
-		$("#referencia").removeAttr("disabled");
-	}
-}

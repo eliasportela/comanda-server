@@ -28,7 +28,7 @@ $route['admin/produto/(:num)'] = 'Produto/Editar';
 $route['admin/produto/cadastro'] = 'Produto/Cadastro';
 
 $route['admin/api/produto/(:num)']['get'] = 'Produto/Get';
-$route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId';
+$route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId'; //REMOCOES
 $route['admin/api/produtos-categoria/(:num)']['get'] = 'Produto/getProdutosCategoria';
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 $route['admin/api/produto']['post'] = 'Produto/Register';

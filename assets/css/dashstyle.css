@@ -30,7 +30,9 @@
 #btn-login{
 	font-weight: 900;
 }
-
+.invisivel{
+	visibility: hidden
+}
 @media (max-width: 600px) 
 {
 	#myVideo{

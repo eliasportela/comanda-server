@@ -38,30 +38,28 @@ img{
         <br>
         <div class="w3-responsive w3-card w3-white w3-padding-32">
           <div class="w3-row-padding">
-            <div class="w3-col <?=$coluna?> w3-margin-top">
-              <label>Categoria do Produto</label>
-              <select class="w3-select w3-white w3-border" id="id_categoria" name="id_categoria">
+            <div class="w3-col m3 w3-margin-top">
+              <label for="id_categoria">Categoria do Produto</label>
+                <select class="w3-select w3-white w3-border" id="id_categoria" name="id_categoria">
                 <?php foreach ($categoria_produto as $c):?>
                   <option value="<?=$c->id_categoria?>"><?=$c->nome_categoria?></option>
                 <?php endforeach; ?>
               </select>
             </div>
-            <div class="w3-col <?=$coluna?> w3-margin-top">
+            <div class="w3-col m3 w3-margin-top">
               <label for="nome_produto">Nome Produto</label>
               <input type="text" class="w3-input w3-border" placeholder="Nome Produto" id="nome_produto" name="nome_produto" required>
             </div>
-            <?php if (!$editar): ?>
-            <div class="w3-col <?=$coluna?> w3-margin-top">
-              <label for="email">Gerar Referência</label>  
-              <select class="w3-select w3-white w3-border" id="gerar_referencia" name="gerar_referencia" onchange="toogleGerarReferencia()">
-                <option value="1">Sim</option>
-                <option value="0">Referência manual</option>
-              </select>
-            </div>
-            <?php endif;?>
-            <div class="w3-col <?=$coluna?> w3-margin-top">
+            <div class="w3-col m3 w3-margin-top">
               <label for="referencia">Referência</label>
-              <input type="text" class="w3-input w3-border" placeholder="Informe a referência" id="referencia" name="referencia" <?=(!$editar ? "disabled" : "")?> >
+              <input type="text" class="w3-input w3-border" placeholder="Referência do Produto" id="referencia" name="referencia" <?=(!$editar ? "disabled" : "")?> >
+            </div>
+            <div class="w3-col m3 w3-margin-top">
+              <label for="gerar_pedido">Gerar Pedido</label>
+              <select class="w3-select w3-white w3-border" id="gerar_pedido" name="gerar_pedido">
+                  <option value="1">Sim</option>
+                  <option value="0">Não</option>
+              </select>
             </div>
           </div>
         </div>

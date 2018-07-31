@@ -64,17 +64,14 @@ class Comanda extends CI_Controller {
 			if ($dataModel) {
 				
 				$data['comanda'] = $dataModel;
+				$modal['categorias'] = $this->Crud_model->Query("SELECT id_categoria, nome_categoria from categoria_produto where id_categoria != 1");
 
-				$sql = "SELECT id_produto, nome_produto, ref_produto FROM produto WHERE fg_ativo = 1 AND id_categoria != 1";
-				$data['produtos'] = $this->Crud_model->Query($sql);
-
-				$menu['id_page'] = 2;
-                $header['title'] = 'Dash | Comanda';
+				$header['title'] = 'Dash | Comanda';
                 $header['page'] = '1';
 
                 $this->load->view('dashboard/template/commons/header',$header);
                 $this->load->view('dashboard/comanda/editar-comanda',$data);
-                $this->load->view('dashboard/comanda/modal-comanda',$menu);
+                $this->load->view('dashboard/comanda/modal-comanda',$modal);
                 $this->load->view('dashboard/template/commons/footer');
 
 			}else{

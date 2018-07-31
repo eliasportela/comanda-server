@@ -1,8 +1,8 @@
 jQuery(document).ready(function () {
 
 	//Buscando Produtor
-	if ($("#id_produto").val() != undefined) {
-		IDPRODUTO = $("#id_produto").val();
+    IDPRODUTO = $("#id_produto").val();
+    if (IDPRODUTO !== undefined) {
 		getProdutoID(IDPRODUTO);
 	}
 
@@ -48,7 +48,9 @@ function getProdutoID(id) {
 	var url = base_urla + 'admin/api/produto/id/' + id;
 	var data = null;
 	var itens = null;
-	
+	var tabelas = null;
+	var produto = null;
+
 	var selector = $("#itens");
 	selector.empty();
 
@@ -62,35 +64,36 @@ function getProdutoID(id) {
 			itens = data.itens;
 			tabelas = data.valores;
 
+		    console.log(data);
 			$("#nome_produto").val(produto.nome_produto);
 			$("#id_categoria").val(produto.id_categoria);
 			$("#referencia").val(produto.ref_produto);
+			$("#gerar_pedido").val(produto.gerar_pedido);
 
 		} else {
 			swal("", "Erro interno, por favor recarregue a página", "error");
 		}
-	})
-		.done(function () {
-			if (itens != null) {
-				itens.forEach(function (obj) {
-					var col = "";
-					col += "<td>" + obj.nome_produto + "</td>";
-					col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
-					selector.append("<tr>" + col + "</tr>");
-				});
-			}
+	}).done(function () {
+		if (itens != null) {
+			itens.forEach(function (obj) {
+				var col = "";
+				col += "<td>" + obj.nome_produto + "</td>";
+				col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
+				selector.append("<tr>" + col + "</tr>");
+			});
+		}
 
-			if (tabelas != null) {
-				tabelas.forEach(function (obj) {
-					var col = "";
-					col += "<td>" + obj.nome_tabela + "</td>";
-					col += "<td>" + obj.valor + "</td>";
-					col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
-					tabelaPrecos.append("<tr>" + col + "</tr>");
-				});
-			}
+		if (tabelas != null) {
+			tabelas.forEach(function (obj) {
+				var col = "";
+				col += "<td>" + obj.nome_tabela + "</td>";
+				col += "<td>" + obj.valor + "</td>";
+				col += '<td><button class="w3-button w3-dark-gray w3-round">Remover</button></td>';
+				tabelaPrecos.append("<tr>" + col + "</tr>");
+			});
+		}
 
-		});
+	});
 }
 
 function deletarProdutorId(id) {

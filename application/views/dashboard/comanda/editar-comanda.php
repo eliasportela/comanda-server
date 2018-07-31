@@ -56,31 +56,11 @@
     <br>
     <div class="w3-row">
         <div class="w3-col m9">
-            <div class="w3-card w3-white w3-padding w3-padding-32">
-                <div class="w3-row-padding">
-                    <div class="w3-col m3">
-                        <label>Referência do Produto</label>
-                        <input type="text" class="w3-input w3-border" placeholder="EX: REF123">
-                    </div>
-                    <div class="w3-col m5">
-                        <label>Selecione o produto a ser inserido</label>
-                        <select class="w3-select w3-border w3-white" id="produtos">
-                            <option value="0">Selecione</option>
-                            <?php foreach ($produtos as $pr){?>
-                            <option value="<?=$pr->id_produto?>"><?=$pr->ref_produto .' - '. $pr->nome_produto?></option>
-                            <?php }?>
-                        </select>
-                    </div>
-                    <div class="w3-col m2">
-                        <label>Quantidade</label>
-                        <input type="number" class="w3-input w3-border" placeholder="EX: 3">
-                    </div>
-                    <div class="w3-col m2">
-                        <label>Inserir Produto</label>
-                        <button class="w3-button w3-black w3-dark-gray w3-block" type="button" onclick="addItemTabela()"><i class="fa fa-plus"></i> Adicionar</button>
-                    </div>
+            <div class="w3-card w3-white">
+                <div class="w3-padding w3-padding-16">
+                    <button class="w3-button w3-dark-gray w3-right" type="button" onclick="toogleModalProduto(1)"><i class="fa fa-plus"></i> Adicionar Produto</button>
+                    <h6>Produtos da comanda</h6>
                 </div>
-                <br>
                 <div class="w3-responsive w3-border-bottom" style="min-height: 300px;margin:0 12px">
                     <table class="w3-table w3-bordered w3-centered">
                         <thead>
@@ -101,7 +81,7 @@
             </div>
         </div>
         <div class="w3-col m3">
-            <div class="w3-margin-left w3-card w3-white w3-padding w3-padding-16 w3-display-container" style="min-height: 447px;">
+            <div class="w3-margin-left w3-card w3-white w3-padding w3-padding-16 w3-display-container" style="min-height: 375px;">
                 <div class="w3-green w3-padding w3-paddin-16">
                     <h5><b>Total da Comanda</b></h5>
                     <h2 class="w3-right-align">R$ <span id="totalComanda"></span></h2>
@@ -118,48 +98,5 @@
         </div>
     </div>
 </div>
-
-<div id="modalProduto" class="w3-modal">
-  <div class="w3-modal-content modal w3-card-4 w3-animate-left" style="margin-top: 60px">
-    <form method="POST" action="" id="inserirPropriedade">
-      <div class="w3-container w3-padding-16 w3-large w3-border-bottom">
-        <i class="fa fa-tag"></i> <span id="titleProduto"></span>
-        <span class="w3-right" onclick="toogleModalProduto(0)" style="cursor: pointer;"><i class="fa fa-times"></i></span>
-      </div>
-      <div class="w3-section" >
-        <div class="w3-row-padding">
-            <div class="w3-col l3">
-                <label class="w3-margin-top"><b>Quantidade</b></label>
-                <input type="number" id="qtdProduto" class="w3-input w3-border" value="" placeholder="Quantidade">
-            </div>
-            <div class="w3-col l6">
-                <label class="w3-margin-top"><b>Tabela de Preço</b></label>
-                <select class="w3-select w3-border w3-white" id="tabelaProduto">
-                </select>
-            </div>
-            <div class="w3-col l3">
-                <label class="w3-margin-top"><b>Valor</b></label>
-                <input type="text" class="w3-input w3-border" id="valorProduto" placeholder="Valor do Produto" disabled>
-            </div>
-            <div class="w3-col l12 w3-margin-top">
-                <label class="w3-margin-top"><b>Observação</b></label>
-                <textarea class="w3-input w3-border" placeholder="Observação sobre o pedido" id="obsProduto"></textarea>
-            </div>
-        </div>
-      </div>
-      <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
-        <button onclick="toogleModalProduto(0)" type="button" class="w3-button w3-gray" style="width: 150px">
-          <i class="fa fa-times"></i>
-          Fechar
-        </button>
-        <button type="submit" class="w3-button w3-red w3-right" style="width: 150px">
-          <i class="fa fa-check"></i>
-          Salvar
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
 
 <script type="text/javascript" src="<?php echo base_url('assets/js/dashboard/comanda/editar.js');?>"></script>

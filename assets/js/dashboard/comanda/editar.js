@@ -1,14 +1,16 @@
 jQuery(document).ready(function () {
 
+    toogleModalProduto(1);
+
     //Buscando Produtos da comanda
-	if ($("#id_comanda").val() != undefined) {
-		IDCOMANDA = $("#id_comanda").val();
+    IDCOMANDA = $("#id_comanda").val();
+    if (IDCOMANDA !== undefined) {
         getProdutos(IDCOMANDA);
 	}
 
 	jQuery('#editarComanda').submit(function () {
 
-		if ($("#selectCidades").val() == 0) {
+		if ($("#selectCidades").val() === 0) {
 			swal("", "Selecione a cidade do produtor", "warning");
 
 		} else {
@@ -57,13 +59,10 @@ function getProdutos(id) {
 	$.get(url, function (res) {
 		if (res) {
 			data = JSON.parse(res);
-		} else {
-			swal("", "Erro interno, por favor recarregue a página", "error");
 		}
-	})
-	.done(function () {
-		if (data != "") {
-            var valor = 0;
+	}).done(function () {
+        var valor = 0;
+        if (data !== null) {
 			data.forEach(function (obj) {
                 var col = "";
 				var valorUni = (parseFloat(obj.quantidade) * parseFloat(obj.valor));
@@ -77,9 +76,9 @@ function getProdutos(id) {
                 selector.append("<tr onclick='getProdutoId("+ obj.id_comanda +","+ obj.id_produto +")'>" + col + "</tr>");
                 valor +=  valorUni;
             });
-            totalComanda(valor);
 		}
-	});
+        totalComanda(valor);
+    });
 }
 
 function totalComanda(valor){
@@ -114,7 +113,7 @@ function getProdutoId(comanda,produto) {
 }
 
 function toogleModalProduto(arg) {
-	if (arg == 1) {	
+	if (arg === 1) {
 		$("#modalProduto").css("display","block");
 	}else{
 		$("#modalProduto").css("display","none");

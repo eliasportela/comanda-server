@@ -109,7 +109,7 @@ class Produto extends CI_Controller {
 		
 		if ($ref > 0):
 			
-			$sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria
+			$sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria, gerar_pedido
 			FROM produto p
 			WHERE fg_ativo = 1 AND id_produto = $ref";
 
@@ -220,25 +220,21 @@ class Produto extends CI_Controller {
 				
 				$nome_produto = trim($dataRegister['nome_produto']);
 				$id_categoria = trim($dataRegister['id_categoria']);
-				$gerar_referencia = trim($dataRegister['gerar_referencia']);
-				$referencia = "";
+				$gerar_pedido = trim($dataRegister['gerar_pedido']);
 
-				if(isset($dataRegister['referencia'])){
-					$referencia = trim($dataRegister['referencia']);
-				}
-				
-				if($gerar_referencia == 1 OR $referencia == ""){
-					$referencia = "R".rand(1,1000000);
-				}
-
-				$dataModel = array(
-					'nome_produto' => $nome_produto,
-					'id_categoria' => $id_categoria,
-					'ref_produto' => $referencia);
+                $dataModel = array(
+                    'nome_produto' => $nome_produto,
+                    'id_categoria' => $id_categoria,
+                    'gerar_pedido' => $gerar_pedido,
+                    'ref_produto' => rand(1,1000000));
 
 				$res = $this->Crud_model->InsertId('produto',$dataModel);
 
 				if($res):
+
+                    //Editando a referencia do produto
+                    $res2 = $this->Crud_model->Update('produto',array('ref_produto' => 'R0'.$res),array('id_produto' => $res));
+
 					echo $res;
 					$this->output->set_status_header('200');
 					return;
@@ -265,13 +261,13 @@ class Produto extends CI_Controller {
 				$id_produto = trim($dataRegister['id_produto']);
 				$nome_produto = trim($dataRegister['nome_produto']);
 				$id_categoria = trim($dataRegister['id_categoria']);
-				$referencia = trim($dataRegister['referencia']);
-
-				//die(var_dump($dataRegister['produtos']));
+                $gerar_pedido = trim($dataRegister['gerar_pedido']);
+                $referencia = trim($dataRegister['referencia']);
 
 				$dataModel = array(
 					'nome_produto' => $nome_produto,
 					'id_categoria' => $id_categoria,
+					'gerar_pedido' => $gerar_pedido,
 					'ref_produto' => $referencia);
 
 				$res = $this->Crud_model->Update('produto',$dataModel,array('id_produto' => $id_produto));
