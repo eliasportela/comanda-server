@@ -15,6 +15,9 @@
             </div>
             <div class="w3-section" >
                 <div class="w3-row-padding">
+                    <input type="hidden" name="id_comanda" value="<?=$comanda->id_comanda?>">
+                    <input type="hidden" id="gerarPedido" name="gerar_pedido" value="">
+                    <input type="hidden" id="valorPedido" name="valor_pedido" value="">
                     <div class="w3-col m2">
                         <label for="categoria_produto">Categoria</label>
                         <select class="w3-select w3-border w3-white" id="categoria_produto" name="id_categoria" onchange="buscarProdutosCategoria()">
@@ -32,23 +35,23 @@
                     </div>
                     <div class="w3-col m4" id="baseProduto1">
                         <label for="id_produto1">Produto</label>
-                        <select class="w3-select w3-border w3-white produtos" id="id_produto1" onchange="buscarProduto('1')">
+                        <select class="w3-select w3-border w3-white produtos" id="id_produto1" name="produtos[]" onchange="buscarProduto('1')">
                         </select>
                     </div>
                     <div class="w3-col m2 w3-hide" id="baseProduto2">
-                        <label for="id_produto2">Produto</label>
-                        <select class="w3-select w3-border w3-white produtos" id="id_produto2" onchange="buscarProduto('2')">
+                        <label for="id_produto2">Produto 2</label>
+                        <select class="w3-select w3-border w3-white produtos" id="id_produto2" name="produtos[]" onchange="buscarProduto('2')">
                         </select>
                     </div>
                     <div class="w3-col m2">
                         <label for="tipo_pizza">Tabela/Preço</label>
-                        <select class="w3-select w3-border w3-white" id="tabelasProduto" name="tabelasProduto">
+                        <select class="w3-select w3-border w3-white" id="tabelasPreco" name="id_tabela_preco">
                             <option value="0">Selecione um Produto</option>
                         </select>
                     </div>
                     <div class="w3-col m2">
                         <label>Quantidade</label>
-                        <input type="number" class="w3-input w3-border" value="1" placeholder="Quantidade" id="quantidade">
+                        <input type="number" class="w3-input w3-border" value="1" placeholder="Quantidade" id="quantidade" name="quantidade">
                     </div>
                 </div>
                 <div class="w3-row-padding">
@@ -102,7 +105,7 @@
                     </div>
                     <div class="w3-col m4 w3-margin-top">
                         <label class="w3-margin-top"><b>Observações</b></label>
-                        <textarea class="w3-input w3-border" placeholder="Observação sobre o pedido" id="obsProduto" style="height: 250px"></textarea>
+                        <textarea class="w3-input w3-border" placeholder="Observação sobre o pedido" id="obsProduto" name="observacao" style="height: 250px"></textarea>
                     </div>
                 </div>
             </div>

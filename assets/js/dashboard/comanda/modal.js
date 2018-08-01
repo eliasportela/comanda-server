@@ -3,46 +3,31 @@ $(document).ready(function () {
 
     $('#inserirProdutos').submit(function () {
 
-        if ($("#id_produto1").val() > 0 || $("#id_produto2").val() > 0) {
-            swal("", "Selecione a cidade do produtor", "warning");
+        var dadosajax = new FormData(this);
+        pageurl = base_urla + 'admin/api/comanda/inserir-produto';
 
-        } else {
-
-            var dadosajax = {
-                'id_comanda':1,
-                'id_produto':1,
-                'gerar_pedido':1,
-                'quantidade':1,
-                'id_tabela_produto':1,
-                'observacao':1,
-                'produtos':1
-            };
-
-            pageurl = base_urla + 'admin/api/produto';
-
-            request("Salvando as alterações");
-            $.ajax({
-                url: pageurl,
-                type: 'POST',
-                data: dadosajax,
-                mimeType: "multipart/form-data",
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function (data, textStatus, jqXHR) {
-                    requestSuccess();
-                    swal({
-                        title: '', text: 'Dados atualizados com sucesso!!', type: 'success'
-                    }, function () {
-                        location.reload();
-                    });
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
+        request("Salvando as alterações");
+        $.ajax({
+            url: pageurl,
+            type: 'POST',
+            data: dadosajax,
+            mimeType: "multipart/form-data",
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function (data, textStatus, jqXHR) {
+                requestSuccess();
+                swal({
+                    title: '', text: 'Dados atualizados com sucesso!!', type: 'success'
+                }, function () {
                     console.log(jqXHR);
-                    requestSuccess();
-                }
-            });
-        }
+                });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.log(jqXHR);
+                requestSuccess();
+            }
+        });
 
         return false;
     });
@@ -134,7 +119,7 @@ function buscarProduto(id) {
 
     //Remocoes
     var option = $("#remocoesProduto");
-    var optTabelas = $("#tabelasProduto");
+    var optTabelas = $("#tabelasPreco");
 
     $.get(url, function (res) {
         if (res) {
@@ -143,6 +128,9 @@ function buscarProduto(id) {
     }).done(function () {
         option.empty();
         if (data.itens !== null) {
+
+            //gerarPedido
+            $("#gerarPedido").val(data.produto.gerar_pedido);
 
             //add Remocoes
             var itens = [];
@@ -175,17 +163,19 @@ function buscarProduto(id) {
 
             if (id === '1'){
                 VALORESPRODUTO1 = tabelas;
+                console.log(VALORESPRODUTO1);
             } else {
                 VALORESPRODUTO2 = tabelas;
+                console.log(VALORESPRODUTO2);
             }
 
-            VALORESPRODUTOS = VALORESPRODUTO1.concat(VALORESPRODUTO2);
-
-            console.log(VALORESPRODUTOS);
-
-            // var elOptTabelas = $("<option>");
-            // elOptTabelas.val(obj.id_tabela_preco).html(obj.nome_tabela +' - R$'+ obj.valor);
-            // optTabelas.append(elOptTabelas);
+            var mapTabelas = VALORESPRODUTO1.concat(VALORESPRODUTO2);
+            optTabelas.empty();
+            mapTabelas.forEach(function (obj) {
+                var elOptTabelas = $("<option>");
+                elOptTabelas.val(obj.id_tabela_preco).html(obj.nome_tabela +' - R$'+ obj.valor);
+                optTabelas.append(elOptTabelas);
+            });
 
         }
     });
@@ -206,7 +196,7 @@ function addRemocoes() {
         var td2 = $("<td>");
 
         td1.append(nome);
-        td2.append("<input type='hidden' value='"+ id +"' /><button class='w3-button' type='button' onclick='removerRemocao(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
+        td2.append("<input type='hidden' name='remocoes[]' value='"+ id +"' /><button class='w3-button' type='button' onclick='removerRemocao(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
 
         tr.append(td1).append(td2);
         $("#tabelaRemocoes").append(tr);
@@ -229,7 +219,7 @@ function addAdicionais() {
         var td2 = $("<td>");
 
         td1.append(nome);
-        td2.append("<input type='hidden' value='"+ id +"'/><button class='w3-button' type='button' onclick='removerAdicionais(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
+        td2.append("<input type='hidden' name='adicionais[]' value='"+ id +"'/><button class='w3-button' type='button' onclick='removerAdicionais(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
 
         tr.append(td1).append(td2);
         $("#tabelaAdicionais").append(tr);

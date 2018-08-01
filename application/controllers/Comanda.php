@@ -220,18 +220,19 @@ class Comanda extends CI_Controller {
 		endif;
 	}
 
-	public function InserirProdutoComanda(){
-		
-		$dataRegister = $this->input->post();
-		
-		if ($dataRegister == null) {
-			$this->output->set_status_header('500');
-			return;
-		}
+	public function InserirProdutoComanda()
+    {
 
-		//die(var_dump($dataRegister));
-		$id_comanda = $dataRegister['id_comanda'];
+        $dataRegister = $this->input->post();
+
+        if ($dataRegister == null) {
+            $this->output->set_status_header('500');
+            return;
+        }
+
+        $id_comanda = $dataRegister['id_comanda'];
         $gerar_pedido = $dataRegister['gerar_pedido'];
+        $tipo_pizza = $dataRegister['tipo_pizza'];
         $quantidade = $dataRegister['quantidade'];
         $observacao = $dataRegister['observacao'];
         $status_pedido = 0;
@@ -240,72 +241,69 @@ class Comanda extends CI_Controller {
             $status_pedido = 1;
         }
 
-        $id_tabela_produto = $dataRegister['id_tabela_produto'];
-        $id_produto = [];
-
+        $id_tabela_preco = $dataRegister['id_tabela_preco'];
         $dataObservacao = "";
-        $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
-        if ($produtos != null && count($produtos) > 1) {
-            $produtoGenerico = 15;
-            foreach ($produtos as $p) {
-
-                //TODO Verificar o produto com a tabela de preço maior
-                
-                $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $produtoGenerico, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto,'status_pedido' => $status_pedido);
-                $res = $this->Crud_model->Insert('comanda_produto',$dataModel);
-
-                if ($res) {
-                    $data = $this->Crud_model->Read('produto',array('id_produto' => $p));
-                    $dataObservacao .= "1/2 " . $data->nome_produto . "||";
-                }
-            }
-        } else if (count($produtos) == 1){
-        }
 
         $adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
-		if ($adicionais != null) {
-			$obsTemp = "";
-			foreach ($adicionais as $ads) {
-				$adsProduto = explode('||', $ads);
-				$adsId = $adsProduto[0];
-				$adsTabela = $adsProduto[1];
-				$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_produto' => $adsTabela,'status_pedido' => $status_pedido);
-				$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
-				
-				if ($res) {
-					$dataAds = $this->Crud_model->Read('produto',array('id_produto' => $adsId));
-					$obsTemp .= $dataAds->nome_produto . ", ";
-				}
-			}
-			$dataObservacao .= "Adicionais: " . substr($obsTemp, 0, -2) ."||";
-		}
+        if ($adicionais != null) {
+            $obsTemp = "";
+            foreach ($adicionais as $ads) {
+                $adsProduto = explode('||', $ads);
+                $adsId = $adsProduto[0];
+                $adsTabela = $adsProduto[1];
+                $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_preco' => $adsTabela, 'status_pedido' => $status_pedido);
+                $res = $this->Crud_model->Insert('comanda_produto', $dataModel);
 
-		$remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
-		if ($remocoes != null) {
-			$obsTemp = "";
-			foreach ($remocoes as $obs) {
-				$obsTemp .= $obs . ", ";
-			}
-			$dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) ."||";
-		}
+                if ($res) {
+                    $dataAds = $this->Crud_model->Read('produto', array('id_produto' => $adsId));
+                    $obsTemp .= $dataAds->nome_produto . ", ";
+                }
+            }
+            $dataObservacao .= "Adicionais: " . substr($obsTemp, 0, -2) . "||";
+        }
+
+        $remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
+        if ($remocoes != null) {
+            $obsTemp = "";
+            foreach ($remocoes as $obs) {
+                $obsTemp .= $obs . ", ";
+            }
+            $dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) . "||";
+        }
 
 
-		if ($observacao != "") {
-			$observacao = $observacao."||".$dataObservacao;
-		}else {
-			$observacao = $dataObservacao;
-		}
+        if ($observacao != "") {
+            $observacao = $observacao . "||" . $dataObservacao;
+        } else {
+            $observacao = $dataObservacao;
+        }
 
-		$observacao = substr($observacao, 0, -2);
+        $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
+        $produto = $produtos[0];
 
-		$dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $id_produto, 'gerar_pedido' => $gerar_pedido, 'quantidade' => $quantidade, 'id_tabela_produto' => $id_tabela_produto, 'observacao' => $observacao);
-		$res = $this->Crud_model->Insert('comanda_produto',$dataModel);
-		//$res = true;
-		if($res)  {	
-			$this->output->set_status_header('200');
-		}else {
-			$this->output->set_status_header('500');
-		}
-	}
+        if ($produtos != null && $tipo_pizza == 1) {
+            //die(var_dump($tipo_pizza));
+            $produto = 0;
+            foreach ($produtos as $p) {
+                $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
+                $observacao .= "1/2 " . $data->nome_produto . "||";
+            }
+        }
+
+        if (strlen($observacao) > 2) {
+            $observacao = substr($observacao, 0, -2);
+        } else {
+            $observacao = null;
+        }
+
+        $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $produto, 'quantidade' => $quantidade, 'id_tabela_preco' => $id_tabela_preco,'status_pedido' => $status_pedido, 'observacao' => $observacao);
+        $res = $this->Crud_model->Insert('comanda_produto',$dataModel);
+
+        if($res)  {
+            $this->output->set_status_header('200');
+        }else {
+            $this->output->set_status_header('500');
+        }
+    }
 
 }
