@@ -43,7 +43,6 @@ var ITENSADICIONAIS = [];
 
 var VALORESPRODUTO1 = [];
 var VALORESPRODUTO2 = [];
-var VALORESPRODUTOS = []
 
 function buscarProdutosCategoria() {
     var id = $("#categoria_produto").val();
@@ -89,7 +88,7 @@ function mudarTipoPizza() {
 
 function buscarProdutosAdicionais() {
 
-    var url = base_urla + 'admin/api/produtos-categoria/' + 1;
+    var url = base_urla + 'admin/api/produtos-categoria-tabela/' + 1;
     var data = null;
     var option = $("#adicionaisProduto");
 
@@ -102,7 +101,7 @@ function buscarProdutosAdicionais() {
         if (data !== null) {
             data.forEach(function (obj) {
                 var eloption = $("<option>");
-                eloption.val(obj.id_produto).html(obj.nome_produto);
+                eloption.val(obj.id_produto).html(obj.nome_produto).attr('data-tabela',obj.id_tabela_preco);
                 option.append(eloption);
             });
 
@@ -163,10 +162,8 @@ function buscarProduto(id) {
 
             if (id === '1'){
                 VALORESPRODUTO1 = tabelas;
-                console.log(VALORESPRODUTO1);
             } else {
                 VALORESPRODUTO2 = tabelas;
-                console.log(VALORESPRODUTO2);
             }
 
             var mapTabelas = VALORESPRODUTO1.concat(VALORESPRODUTO2);
@@ -209,17 +206,20 @@ function addAdicionais() {
 
     var id = $("#adicionaisProduto").val();
     var nome = $("#adicionaisProduto").find("option:selected").text();
+    var tabela = $("#adicionaisProduto").find("option:selected").attr('data-tabela');
 
-    if (!ITENSADICIONAIS.includes(id) && ($("#id_produto1").val() > 0 || $("#id_produto2").val() > 0 )) {
+    var include = id+'||'+tabela;
 
-        ITENSADICIONAIS.push(id);
+    if (!ITENSADICIONAIS.includes(include) && ($("#id_produto1").val() > 0 || $("#id_produto2").val() > 0 )) {
+
+        ITENSADICIONAIS.push(include);
 
         var tr = $("<tr>");
         var td1 = $("<td>");
         var td2 = $("<td>");
 
         td1.append(nome);
-        td2.append("<input type='hidden' name='adicionais[]' value='"+ id +"'/><button class='w3-button' type='button' onclick='removerAdicionais(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
+        td2.append("<input type='hidden' name='adicionais[]' value='"+ include +"'/><button class='w3-button' type='button' onclick='removerAdicionais(" + id + ")' ><i class='fa fa-trash-o w3-text-red'></i></button>")
 
         tr.append(td1).append(td2);
         $("#tabelaAdicionais").append(tr);

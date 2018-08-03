@@ -171,7 +171,7 @@ class Comanda extends CI_Controller {
 		$id = $this->uri->segment(4);
 		if ($id > 0):
 			
-			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, cp.valor_produto, tp.nome_tabela
+			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, t.valor, tp.nome_tabela
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
@@ -230,6 +230,8 @@ class Comanda extends CI_Controller {
             return;
         }
 
+        //die(var_dump($dataRegister));
+
         $id_comanda = $dataRegister['id_comanda'];
         $gerar_pedido = $dataRegister['gerar_pedido'];
         $tipo_pizza = $dataRegister['tipo_pizza'];
@@ -282,8 +284,12 @@ class Comanda extends CI_Controller {
         $produto = $produtos[0];
 
         if ($produtos != null && $tipo_pizza == 1) {
-            //die(var_dump($tipo_pizza));
-            $produto = 0;
+
+            //Obtendo o id do produto 1/2 1/2
+            $data = $this->Crud_model->Read('produto', array('ref_produto' => "R00"));
+            $produto = $data->id_produto;
+
+            $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
             foreach ($produtos as $p) {
                 $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
                 $observacao .= "1/2 " . $data->nome_produto . "||";
@@ -295,6 +301,7 @@ class Comanda extends CI_Controller {
         } else {
             $observacao = null;
         }
+
 
         $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $produto, 'quantidade' => $quantidade, 'id_tabela_preco' => $id_tabela_preco,'status_pedido' => $status_pedido, 'observacao' => $observacao);
         $res = $this->Crud_model->Insert('comanda_produto',$dataModel);

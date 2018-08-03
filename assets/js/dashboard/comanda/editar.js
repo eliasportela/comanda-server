@@ -1,7 +1,5 @@
 jQuery(document).ready(function () {
 
-    toogleModalProduto(1);
-
     //Buscando Produtos da comanda
     IDCOMANDA = $("#id_comanda").val();
     if (IDCOMANDA !== undefined) {

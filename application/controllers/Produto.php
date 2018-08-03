@@ -331,10 +331,10 @@ class Produto extends CI_Controller {
 		
 		if ($id > 0):
 			
-			$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto, p.id_categoria, tp.id_tabela_produto, t.nome_tabela, c.gerar_pedido
+			$sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto, p.id_categoria, tp.id_tabela_preco, t.nome_tabela, p.gerar_pedido
 			FROM produto p
-			INNER JOIN tabela_produto tp ON (tp.id_produto = p.id_produto)
-			INNER JOIN tabela_preco t ON (t.id_tabela = tp.id_tabela)
+			INNER JOIN tabela_preco tp ON (tp.id_produto = p.id_produto)
+			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
 			INNER JOIN categoria_produto c ON (c.id_categoria = p.id_categoria)
 			WHERE p.fg_ativo = 1 AND p.id_categoria = $id order by p.id_produto, t.id_tabela";
 
