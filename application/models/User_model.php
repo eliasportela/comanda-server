@@ -54,6 +54,15 @@ class User_model extends CI_Model
 		return $results;
 	}
 
+    function LoginToken($data){
+	    if ($data) {
+            $par = array('email' => $data, 'fg_ativo' => 1);
+            $this->db->select('*')->from('usuario')->where($par);
+            $results = $this->db->get()->result();
+            return $results;
+        }
+        return false;
+    }
 
 	function Validar($data){
 		//die(var_dump($data));

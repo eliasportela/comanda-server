@@ -3,7 +3,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 # Rotas do Tamplate
 $route['default_controller'] = 'Dashboard';
-$route['api/solicitar-contato'] = 'Site/SolicitarContato';
 
 # Rotas Do Dashboard
 $route['admin'] = 'Dashboard';
@@ -27,6 +26,25 @@ $route['admin/produto'] = 'Produto';
 $route['admin/produto/(:num)'] = 'Produto/Editar';
 $route['admin/produto/cadastro'] = 'Produto/Cadastro';
 
+#Comanda
+$route['admin/comanda'] = 'Comanda';
+$route['admin/comanda/(:num)'] = 'Comanda/Editar';
+$route['admin/comanda/cadastro'] = 'Comanda/Cadastro';
+
+
+//Pedido
+$route['admin/pedidos']['get'] = 'Pedido';
+
+
+/*
+ * APIS do sistema
+ */
+
+//Autenticação do Usuário
+$route['api/autenticar']['post'] = 'User/getAutenticacao';
+
+// Produto
+
 $route['admin/api/produto/(:num)']['get'] = 'Produto/Get';
 $route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId'; //REMOCOES
 $route['admin/api/produtos-categoria/(:num)']['get'] = 'Produto/getProdutosCategoria';
@@ -35,34 +53,34 @@ $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar']['post'] = 'Produto/Edit';
 $route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';
 
-#Produto Preço e Itens (id-produto/id-tabela)
+#Produto Preço e Ingredientes
+
 $route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeletePrevisao';
 $route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamento';
 
-#Comanda
-$route['admin/comanda'] = 'Comanda';
-$route['admin/comanda/(:num)'] = 'Comanda/Editar';
-$route['admin/comanda/cadastro'] = 'Comanda/Cadastro';
+//Comanda
 
-$route['admin/api/comandas']['get'] = 'Comanda/Comandas';
-$route['admin/api/comanda/id/(:num)']['get'] = 'Comanda/ComandaId';
-$route['admin/api/comanda/ref/(:any)']['get'] = 'Comanda/ComandaRef';
-$route['admin/api/comanda/inserir-comanda']['post'] = 'Comanda/InserirComanda';
-$route['admin/api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
-$route['admin/api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
-$route['admin/api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
+$route['api/comandas/(:num)/(:any)']['get'] = 'Comanda/GetComandas';
 
-//Pedido
-$route['admin/pedidos']['get'] = 'Pedido';
-$route['admin/api/pedidos'] = 'Pedido/PedidosAbertos';
-$route['admin/api/finalizar-pedidos/(:num)']['get'] = 'Pedido/finalizarPedido';
-$route['admin/api/pedidos-comanda/(:num)']['get'] = 'Pedido/PedidosComanda';
+$route['api/comanda/inserir-comanda']['post'] = 'Comanda/InserirComanda';
+$route['api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
+$route['api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
+$route['api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
 
-$route['admin/api/cardapio/(:num)']['get'] = 'Cardapio/ListarCardapio';
+// Pedidos
 
-#Util
+$route['api/pedidos/(:num)/(:any)'] = 'Pedido/GetPedidos';
+$route['api/pedidos/editar/(:any)']['post'] = 'Pedido/EditPedido';
+
+// Cardapio
+$route['api/cardapio/(:any)']['get'] = 'Cardapio/ListarCardapio';
+
+//Util
+
 $route['admin/api/categoria-produtos'] = 'Util/GetCategoriasProdutos';
 $route['admin/api/tabela-categoria/(:num)'] = 'Util/GetTabelaCategoria';
+
+// 404 e erros
 
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

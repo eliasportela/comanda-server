@@ -83,22 +83,89 @@ class Comanda extends CI_Controller {
 		}
 	}
 	
-	public function Comandas(){
+	public function GetComandas(){
 
-		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.observacao, c.mesa, cl.nome_cliente 
-        FROM comanda c 
-        LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
-        where c.status = 1 order by c.mesa asc';
+        $pagina = $this->uri->segment(3);
+        $chave = $this->uri->segment(4);
+        $nivel_acesso = 1;
 
-		$res = $this->Crud_model->Query($sql);
-		
-		if ($res):
-			$json = json_encode($res,JSON_UNESCAPED_UNICODE);
-			echo $json;
-			return;
-		else: 
-			$this->output->set_status_header('204');
-		endif;		
+        $pagination = "LIMIT 10 OFFSET ".($pagina - 1) * 10;
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
+
+        if ($acesso_aprovado) {
+
+            $where_clause = "WHERE 1=1 ";
+            $order_clause = "";
+
+            //ID da comanda
+            if ($this->input->get('id_comanda') != null) {
+                $par = (int) $this->input->get('id_comanda');
+                $where_clause .= " AND c.id_comanda=".$par;
+            }
+
+            //Referencia da comanda
+            if ($this->input->get('ref_comanda') != null) {
+                $par = $this->input->get('ref_comanda');
+                $where_clause .= " AND c.ref_comanda='".$par."'";
+            }
+
+            //Status da comanda
+            if ($this->input->get('status_comanda') != null) {
+                $par = $this->input->get('status_comanda');
+                $where_clause .= " AND c.status=".$par;
+            }
+
+            //Data "DE" da comanda
+            if ($this->input->get('data_de') != null) {
+                $par = $this->input->get('data_de');
+                $where_clause .= " DATE(data_comanda) >= '".$par."'";
+            }
+
+            //Data "Ate" da comanda
+            if ($this->input->get('data_ate') != null) {
+                $par = $this->input->get('data_ate');
+                $where_clause .= " DATE(data_comanda) <= '".$par."'";
+            }
+
+            //Tipo da comanda
+            if ($this->input->get('tipo_comanda') != null) {
+                $par = (int) $this->input->get('tipo_comanda');
+                if ($par == 1) {
+                    $where_clause .= " AND c.mesa is not null";
+                } else if ($par == 2) {
+                    $where_clause .= " AND c.id_cliente_viagem is not null";
+                }
+            }
+
+            //Ordenacao por data
+            if ($this->input->get('ordenar') != null) {
+                $order = ($this->input->get('ordenar') === 'true');
+                if ($order) {
+                    $order_clause = "ORDER BY c.data_comanda desc";
+                } else {
+                    $order_clause = "ORDER BY c.data_comanda asc";
+                }
+            }
+
+            $sql = "SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, '%d-%m') as data_comanda, 
+            DATE_FORMAT(c.data_comanda, '%h:%i') as hora_comanda, c.ref_comanda, c.observacao, c.mesa, cl.nome_cliente 
+            FROM comanda c 
+            LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
+            $where_clause $order_clause $pagination";
+
+            $res = $this->Crud_model->Query($sql);
+            if ($res){
+                $json = json_encode($res,JSON_UNESCAPED_UNICODE);
+                echo $json;
+                return;
+            } else {
+                $this->output->set_status_header('204');
+                return;
+            }
+
+        }
+
+        $this->output->set_status_header('401');
 	}
 
 	public function InserirComanda(){
@@ -131,39 +198,6 @@ class Comanda extends CI_Controller {
 		}
 
 		$this->output->set_status_header('500');	
-	}
-
-	public function ComandaId(){
-
-		$id = $this->uri->segment(5);
-		if ($id > 0):
-			
-			$res = $this->Crud_model->Read('comanda',array('id_comanda' => $id));
-
-			if ($res):
-				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
-				echo $json;
-				return;
-			endif;
-		else:
-			$this->output->set_status_header('500');
-		endif;
-	}
-
-	public function ComandaRef(){
-
-		$ref = $this->uri->segment(5);
-		
-		if ($ref != ""):
-			
-			$res = $this->Crud_model->Read('comanda',array('ref_comanda' => $ref));
-			if ($res):
-				echo $res->id_comanda;
-				return;
-			endif;
-		else:
-			$this->output->set_status_header('500');
-		endif;
 	}
 
 	public function ProdutosComanda(){
@@ -289,7 +323,6 @@ class Comanda extends CI_Controller {
             $data = $this->Crud_model->Read('produto', array('ref_produto' => "R00"));
             $produto = $data->id_produto;
 
-            $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
             foreach ($produtos as $p) {
                 $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
                 $observacao .= "1/2 " . $data->nome_produto . "||";
