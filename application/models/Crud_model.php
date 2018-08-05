@@ -112,6 +112,7 @@ class Crud_model extends CI_Model
 	    $result = $query->result();
 
         if($result){
+
             $data_agora = date("Y-m-d H:i:s");
             $data_expiracao = $result[0]->data_expiracao;
             $administrativo = $result[0]->administrativo;

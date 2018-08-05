@@ -7,15 +7,22 @@ class Util extends CI_Controller {
 
 	public function GetCategoriasProdutos(){
 
-		$categorias = $this->Crud_model->Query("SELECT * FROM categoria_produto WHERE pizza = 1");
+        $chave = $this->uri->segment(3);
+        $nivel_acesso = 0;
+
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
+
+        if ($acesso_aprovado) {
+            $categorias = $this->Crud_model->Query("SELECT * FROM categoria_produto WHERE fg_ativo = 1");
+
+            if ($categorias) {
+                $json = json_encode($categorias, JSON_UNESCAPED_UNICODE);
+                echo $json;
+                return;
+            }
+        }
 		
-		if ($categorias) {
-			$json = json_encode($categorias,JSON_UNESCAPED_UNICODE);
-			echo $json;
-			return;
-		}
-		
-		$this->output->set_status_header('500');
+		$this->output->set_status_header('401');
 	}
 
 	public function GetTabelaCategoria(){

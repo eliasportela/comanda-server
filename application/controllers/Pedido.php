@@ -63,7 +63,7 @@ class Pedido extends CI_Controller {
                 }
             }
 
-            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.nome_categoria, p.nome_produto, cp.quantidade, t.nome_tabela, cp.status_pedido, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.observacao
+            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.nome_categoria, cat.id_categoria, p.nome_produto, cp.quantidade, t.nome_tabela, cp.status_pedido, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.observacao
 			FROM comanda_produto cp
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
@@ -74,8 +74,7 @@ class Pedido extends CI_Controller {
 
             $res = $this->Crud_model->Query($sql);
 
-            if ($res):
-
+            if ($res) {
                 $json = [];
                 $observacao = [];
                 foreach ($res as $obs) {
@@ -91,7 +90,11 @@ class Pedido extends CI_Controller {
                 $json = json_encode($json, JSON_UNESCAPED_UNICODE);
                 echo $json;
                 return;
-            endif;
+
+            } else {
+                $this->output->set_status_header('204');
+                return;
+            }
 
         }
 

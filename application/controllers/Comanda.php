@@ -82,7 +82,7 @@ class Comanda extends CI_Controller {
 			redirect(base_url('login'));
 		}
 	}
-	
+
 	public function GetComandas(){
 
         $pagina = $this->uri->segment(3);
@@ -168,70 +168,101 @@ class Comanda extends CI_Controller {
         $this->output->set_status_header('401');
 	}
 
-	public function InserirComanda(){
+	public function RegisterComanda(){
 
-		$dataRegister = $this->input->post();
-		
-		if ($dataRegister == null) {
-			$this->output->set_status_header('500');
-			return;
-		}
+        $chave = $this->uri->segment(4);
+        $nivel_acesso = 2;
+        $json = [];
 
-		$mesa = $dataRegister['mesa'];
-		$observacao = $dataRegister['observacao'];
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
 
-		$ref_comanda = rand(1,00000000000000);
+        if ($acesso_aprovado) {
 
-		$dataModel = array('mesa' => $mesa, 'observacao' => $observacao, 'ref_comanda' => $ref_comanda);
-		$res = $this->Crud_model->InsertID('comanda',$dataModel);
-		if ($res) {
-			$id = $res;
-			$dataModel = array('ref_comanda' => "CMD0".$id);
-			$res = $this->Crud_model->Update('comanda',$dataModel,array('id_comanda' => $id));
-			if($res) {
-				echo $id;
-				$this->output->set_status_header('200');
-				return;
-			}else {
-				$this->output->set_status_header('500');
-			}
-		}
+            $dataRegister = $this->input->post();
 
-		$this->output->set_status_header('500');	
+            if ($dataRegister == null) {
+                echo json_encode(array('result' => 'Erro nos parametros enviados','id_comanda' => null), JSON_UNESCAPED_UNICODE);
+                $this->output->set_status_header('500');
+                return;
+            }
+
+            $mesa = $dataRegister['mesa'];
+            $observacao = $dataRegister['observacao'];
+
+            $ref_comanda = rand(1000, 9000);
+
+            $dataModel = array('mesa' => $mesa, 'observacao' => $observacao, 'ref_comanda' => $ref_comanda);
+            $res = $this->Crud_model->InsertID('comanda', $dataModel);
+            if ($res) {
+                $dataModel = array('ref_comanda' => $ref_comanda + $res);
+                $res2 = $this->Crud_model->Update('comanda', $dataModel, array('id_comanda' => $res));
+                if ($res2) {
+                    echo json_encode(array('result' => 'Sucesso','id_comanda' => $res), JSON_UNESCAPED_UNICODE);
+                    return;
+
+                } else {
+                    echo json_encode(array('result' => 'Erro no Servidor','id_comanda' => null), JSON_UNESCAPED_UNICODE);
+                    $this->output->set_status_header('500');
+                    return;
+                }
+            }
+
+        }
+
+        echo json_encode(array('result' => 'Você não tem acesso a esta função!','id_comanda' => null), JSON_UNESCAPED_UNICODE);
+		$this->output->set_status_header('401');
 	}
 
-	public function ProdutosComanda(){
+	public function GetProdutosComanda(){
 
-		$id = $this->uri->segment(4);
-		if ($id > 0):
-			
-			$sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, t.valor, tp.nome_tabela
+		$chave = $this->uri->segment(4);
+        $nivel_acesso = 1;
+
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
+
+        if ($acesso_aprovado) {
+
+            $id = $this->uri->segment(5);
+
+            $where_clause = "AND cp.id_comanda = $id ";
+            if ($this->input->get("id_pedido") != null) {
+                $par = (int) $this->input->get("id_pedido");
+                $where_clause .= " AND cp.id_comanda_produto = $par";
+            }
+
+            $sql = "SELECT cp.id_comanda_produto, p.id_produto, c.id_comanda, p.ref_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, tp.valor, t.nome_tabela, cp.observacao
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
-			INNER JOIN tabela_preco t ON (t.id_tabela_preco = cp.id_tabela_preco)
-			INNER JOIN tabela_produto tp ON (tp.id_tabela = t.id_tabela)
-			WHERE cp.fg_ativo = 1 AND cp.id_comanda = $id AND cat.id_categoria != 1 ORDER BY cp.id_comanda_produto";
+			INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
+			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
+			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 $where_clause ORDER BY cp.id_comanda_produto";
 
-			$res = $this->Crud_model->Query($sql);
-			
-			if ($res):
-				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
-				echo $json;
-				return;
-			endif;
-		else:
-			$this->output->set_status_header('500');
-		endif;
+            $res = $this->Crud_model->Query($sql);
+
+            if ($res) {
+                $json = json_encode($res, JSON_UNESCAPED_UNICODE);
+                echo $json;
+                return;
+
+            } else {
+                $this->output->set_status_header('204');
+                return;
+
+            }
+
+            $this->output->set_status_header('401');
+
+        }
 	}
 
-	public function ProdutoComandaId(){
+	public function GetDetalhesProdutoComanda(){
 
 		$produto = $this->uri->segment(4);
 
 		if ($produto > 0):
-			
+
 			$sql = "SELECT cp.id_comanda_produto, cat.id_categoria, cat.nome_categoria, p.nome_produto, cp.quantidade, tp.nome_tabela, cp.observacao
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
@@ -243,7 +274,7 @@ class Comanda extends CI_Controller {
 
 			$res = $this->Crud_model->Query($sql);
 			$res = $res[0];
-			
+
 			if ($res):
 				$json = json_encode($res,JSON_UNESCAPED_UNICODE);
 				echo $json;

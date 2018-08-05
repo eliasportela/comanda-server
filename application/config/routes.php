@@ -61,10 +61,10 @@ $route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamen
 //Comanda
 
 $route['api/comandas/(:num)/(:any)']['get'] = 'Comanda/GetComandas';
+$route['api/comandas/prudutos/(:any)/(:num)']['get'] = 'Comanda/GetProdutosComanda';
 
-$route['api/comanda/inserir-comanda']['post'] = 'Comanda/InserirComanda';
-$route['api/comanda-prudutos/(:num)']['get'] = 'Comanda/ProdutosComanda';
-$route['api/comanda-pruduto/(:num)']['get'] = 'Comanda/ProdutoComandaId';
+$route['api/comandas/inserir/(:any)']['post'] = 'Comanda/RegisterComanda';
+$route['api/comandas/prudutos/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 $route['api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
 
 // Pedidos
@@ -77,7 +77,7 @@ $route['api/cardapio/(:any)']['get'] = 'Cardapio/ListarCardapio';
 
 //Util
 
-$route['admin/api/categoria-produtos'] = 'Util/GetCategoriasProdutos';
+$route['api/categorias/(:any)']['get'] = 'Util/GetCategoriasProdutos';
 $route['admin/api/tabela-categoria/(:num)'] = 'Util/GetTabelaCategoria';
 
 // 404 e erros
