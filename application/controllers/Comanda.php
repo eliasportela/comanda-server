@@ -89,7 +89,7 @@ class Comanda extends CI_Controller {
         $chave = $this->uri->segment(4);
         $nivel_acesso = 1;
 
-        $pagination = "LIMIT 10 OFFSET ".($pagina - 1) * 10;
+        $pagination = "LIMIT 30 OFFSET ".($pagina - 1) * 30;
         $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
 
         if ($acesso_aprovado) {
@@ -287,93 +287,111 @@ class Comanda extends CI_Controller {
 
 	public function InserirProdutoComanda()
     {
+        $chave = $this->uri->segment(5);
+        $nivel_acesso = 1;
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
 
-        $dataRegister = $this->input->post();
+        if ($acesso_aprovado) {
 
-        if ($dataRegister == null) {
-            $this->output->set_status_header('500');
-            return;
-        }
+            $dataRegister = $this->input->post();
 
-        //die(var_dump($dataRegister));
+            $id_comanda = $dataRegister['id_comanda'];
+            $id_tabela = $dataRegister['id_tabela'];
+            $gerar_pedido = $dataRegister['gerar_pedido'];
+            $quantidade = $dataRegister['quantidade'];
+            $observacao = $dataRegister['observacao'];
+            $status_pedido = 0;
 
-        $id_comanda = $dataRegister['id_comanda'];
-        $gerar_pedido = $dataRegister['gerar_pedido'];
-        $tipo_pizza = $dataRegister['tipo_pizza'];
-        $quantidade = $dataRegister['quantidade'];
-        $observacao = $dataRegister['observacao'];
-        $status_pedido = 0;
+            $dataObservacao = "";
+            $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
+            $produto = $produtos[0];
+            if (count($produtos) > 1) {
 
-        if ($gerar_pedido == 1) {
-            $status_pedido = 1;
-        }
+                //Obtendo o id do produto 1/2 1/2
+                $data = $this->Crud_model->Read('produto', array('ref_produto' => "P00"));
+                $produto = $data->id_produto;
 
-        $id_tabela_preco = $dataRegister['id_tabela_preco'];
-        $dataObservacao = "";
-
-        $adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
-        if ($adicionais != null) {
-            $obsTemp = "";
-            foreach ($adicionais as $ads) {
-                $adsProduto = explode('||', $ads);
-                $adsId = $adsProduto[0];
-                $adsTabela = $adsProduto[1];
-                $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $adsId, 'quantidade' => 1, 'id_tabela_preco' => $adsTabela, 'status_pedido' => $status_pedido);
-                $res = $this->Crud_model->Insert('comanda_produto', $dataModel);
-
-                if ($res) {
-                    $dataAds = $this->Crud_model->Read('produto', array('id_produto' => $adsId));
-                    $obsTemp .= $dataAds->nome_produto . ", ";
+                foreach ($produtos as $p) {
+                    $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
+                    $dataObservacao .= "1/2 " . $data->nome_produto . "||";
                 }
             }
-            $dataObservacao .= "Adicionais: " . substr($obsTemp, 0, -2) . "||";
-        }
 
-        $remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
-        if ($remocoes != null) {
-            $obsTemp = "";
-            foreach ($remocoes as $obs) {
-                $obsTemp .= $obs . ", ";
+            $adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
+            if ($adicionais != null) {
+                $obsTemp = "";
+                foreach ($adicionais as $ads) {
+                    $adsProduto = explode('||', $ads);
+                    $adsId = $adsProduto[0];
+                    $adsTabela = $adsProduto[1];
+                    $dataModel = array(
+                        'id_comanda' => $id_comanda,
+                        'id_produto' => $adsId,
+                        'quantidade' => 1,
+                        'id_tabela_preco' => $adsTabela);
+
+                    $res = $this->Crud_model->Insert('comanda_produto', $dataModel);
+
+                    if ($res) {
+                        $dataAds = $this->Crud_model->Read('produto', array('id_produto' => $adsId));
+                        $obsTemp .= $dataAds->nome_produto . ", ";
+                    }
+                }
+                $dataObservacao .= "Adicionais: " . substr($obsTemp, 0, -2) . "||";
             }
-            $dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) . "||";
-        }
 
+            $remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
+            if ($remocoes != null) {
+                $obsTemp = "";
+                foreach ($remocoes as $obs) {
+                    $obsTemp .= $obs . ", ";
+                }
+                $dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) . "||";
+            }
 
-        if ($observacao != "") {
-            $observacao = $observacao . "||" . $dataObservacao;
-        } else {
-            $observacao = $dataObservacao;
-        }
-
-        $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
-        $produto = $produtos[0];
-
-        if ($produtos != null && $tipo_pizza == 1) {
-
-            //Obtendo o id do produto 1/2 1/2
-            $data = $this->Crud_model->Read('produto', array('ref_produto' => "R00"));
-            $produto = $data->id_produto;
-
+            //Buscar valor do produto (Sera buscado a tabela do maior valor)
+            $in = "(";
             foreach ($produtos as $p) {
-                $data = $this->Crud_model->Read('produto', array('id_produto' => $p));
-                $observacao .= "1/2 " . $data->nome_produto . "||";
+                $in .= $p . ",";
             }
-        }
+            if (strlen($in) > 2) {
+                $in = substr($in, 0, -1) . ")";
+            }
+            $sql = "SELECT id_tabela_preco FROM tabela_preco 
+            WHERE id_produto in $in AND id_tabela = $id_tabela
+            ORDER BY valor desc LIMIT 1";
+            $data = $this->Crud_model->Query($sql)[0];
 
-        if (strlen($observacao) > 2) {
-            $observacao = substr($observacao, 0, -2);
-        } else {
-            $observacao = null;
-        }
+            //Observacoes
+            if ($observacao != "") {
+                $observacao = $dataObservacao . $observacao . "||";
+            } else {
+                $observacao = $dataObservacao;
+            }
+
+            if (strlen($observacao) > 2) {
+                $observacao = substr($observacao, 0, -2);
+            } else {
+                $observacao = null;
+            }
+
+            $dataModel = array(
+                'id_comanda' => $id_comanda,
+                'id_produto' => $produto,
+                'quantidade' => $quantidade,
+                'id_tabela_preco' => $data->id_tabela_preco,
+                'status_pedido' => $gerar_pedido ? 0 : 1,
+                'observacao' => $observacao);
+
+            $res = $this->Crud_model->Insert('comanda_produto', $dataModel);
+
+            if ($res) {
+                $this->output->set_status_header('200');
+            } else {
+                $this->output->set_status_header('500');
+            }
 
 
-        $dataModel = array('id_comanda' => $id_comanda, 'id_produto' => $produto, 'quantidade' => $quantidade, 'id_tabela_preco' => $id_tabela_preco,'status_pedido' => $status_pedido, 'observacao' => $observacao);
-        $res = $this->Crud_model->Insert('comanda_produto',$dataModel);
-
-        if($res)  {
-            $this->output->set_status_header('200');
-        }else {
-            $this->output->set_status_header('500');
         }
     }
 

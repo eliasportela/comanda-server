@@ -45,9 +45,10 @@ $route['api/autenticar']['post'] = 'User/getAutenticacao';
 
 // Produto
 
-$route['admin/api/produto/(:num)']['get'] = 'Produto/Get';
+$route['api/produtos/precos/(:num)/(:any)']['get'] = 'Produto/getProdutosTabelaPreco';
+$route['api/produtos/itens/(:any)']['get'] = 'Produto/GetProdutosItens';
+
 $route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId'; //REMOCOES
-$route['admin/api/produtos-categoria/(:num)']['get'] = 'Produto/getProdutosCategoria';
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar']['post'] = 'Produto/Edit';
@@ -62,11 +63,10 @@ $route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamen
 
 $route['api/comandas/(:num)/(:any)']['get'] = 'Comanda/GetComandas';
 $route['api/comandas/prudutos/(:any)/(:num)']['get'] = 'Comanda/GetProdutosComanda';
-
 $route['api/comandas/inserir/(:any)']['post'] = 'Comanda/RegisterComanda';
-$route['api/comandas/prudutos/(:num)']['get'] = 'Comanda/ProdutoComandaId';
-$route['api/comanda/inserir-produto']['post'] = 'Comanda/InserirProdutoComanda';
+$route['api/comandas/inserir/produtos/(:any)']['post'] = 'Comanda/InserirProdutoComanda';
 
+$route['api/comandas/prudutos/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 // Pedidos
 
 $route['api/pedidos/(:num)/(:any)'] = 'Pedido/GetPedidos';
