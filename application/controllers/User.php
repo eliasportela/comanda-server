@@ -220,15 +220,27 @@ class User extends CI_Controller {
             echo "4";
         }
     }
-
     public function getAutenticacao() {
 
         $dataLogin = $this->input->post();
         $usuario = isset($dataLogin['usuario']) ? $dataLogin['usuario'] : false;
         $senha = isset($dataLogin['senha']) ? $dataLogin['senha'] : false;
 
-        $res = $this->User_model->LoginToken($usuario);
         $json = [];
+
+        if ($this->input->get('chave') != null){
+            $chave = $this->input->get("chave");
+            $validar = $this->Crud_model->ValidarToken($chave,1);
+
+            if ($validar){
+                $json = array_merge($json,array('result' => 'Autorizado','chave' => $chave));
+            }
+        }
+
+        $res = false;
+        if ($usuario && $senha) {
+            $res = $this->User_model->LoginToken($usuario);
+        }
 
         if ($res) {
 
