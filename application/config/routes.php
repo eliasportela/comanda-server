@@ -64,9 +64,9 @@ $route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamen
 $route['api/comandas/(:num)/(:any)']['get'] = 'Comanda/GetComandas';
 $route['api/comandas/prudutos/(:any)/(:num)']['get'] = 'Comanda/GetProdutosComanda';
 $route['api/comandas/inserir/(:any)']['post'] = 'Comanda/RegisterComanda';
+$route['api/comandas/editar/(:any)']['post'] = 'Comanda/EditComanda';
 $route['api/comandas/inserir/produtos/(:any)']['post'] = 'Comanda/InserirProdutoComanda';
 
-$route['api/comandas/prudutos/(:num)']['get'] = 'Comanda/ProdutoComandaId';
 // Pedidos
 
 $route['api/pedidos/(:num)/(:any)'] = 'Pedido/GetPedidos';
