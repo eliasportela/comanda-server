@@ -266,7 +266,7 @@ class Comanda extends CI_Controller {
                 $where_clause .= " AND cp.id_comanda_produto = $par";
             }
 
-            $sql = "SELECT cp.id_comanda_produto, c.id_comanda, cat.id_categoria, cat.nome_categoria, GROUP_CONCAT(p.id_produto SEPARATOR '||') as id_produto, GROUP_CONCAT(p.nome_produto SEPARATOR '||') as nome_produto, cp.quantidade, tp.valor, t.nome_tabela, cp.observacao
+            $sql = "SELECT cp.id_comanda_produto, c.id_comanda, cat.id_categoria, cat.pizza, cat.nome_categoria, GROUP_CONCAT(p.id_produto SEPARATOR '||') as id_produto, GROUP_CONCAT(p.nome_produto SEPARATOR '||') as nome_produto, cp.quantidade, tp.valor, t.id_tabela, t.nome_tabela, cp.observacao
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN cp_produtos cpp ON (cp.id_comanda_produto = cpp.id_cp)
@@ -287,11 +287,11 @@ class Comanda extends CI_Controller {
                     $pedido = (array)$pedido;
                     $id = $pedido["id_comanda_produto"];
 
-                    $sql = "SELECT p.id_produto, p.nome_produto
+                    $sql = "SELECT p.id_produto, p.nome_produto, cp.id_tabela_preco
                         FROM cp_adicionais cpa
                         INNER JOIN comanda_produto cp ON (cpa.id_cpa = cp.id_comanda_produto)
                         INNER JOIN cp_produtos cpp ON (cp.id_comanda_produto = cpp.id_cp)
-                        INNER JOIN produto p ON (cpp.id_produto  = p.id_produto)
+                        INNER JOIN produto p ON (cpp.id_produto  = p.id_produto) 
                         WHERE cpa.id_cp = $id";
 
                     $res = $this->Crud_model->Query($sql);
@@ -410,6 +410,122 @@ class Comanda extends CI_Controller {
                     if ($id) {
                         $res = $this->Crud_model->Insert('cp_produtos', array("id_cp" => $id, "id_produto" => $adsId));
                         $res = $this->Crud_model->Insert('cp_adicionais', array("id_cp" => $id_comanda_produto, "id_cpa" => $id));
+                    }
+                }
+            }
+
+            if ($res) {
+                $this->output->set_status_header('200');
+            } else {
+                $this->output->set_status_header('500');
+            }
+
+        }
+    }
+
+    public function EditarProdutoComanda()
+    {
+        $id_comanda_produto = $this->uri->segment(5);
+        $chave = $this->uri->segment(6);
+        $nivel_acesso = 2;
+        $acesso_aprovado = $this->Crud_model->ValidarToken($chave, $nivel_acesso);
+
+        if ($acesso_aprovado && $id_comanda_produto != null) {
+
+            $dataRegister = $this->input->post();
+            $id_cp = $id_comanda_produto;
+            $id_comanda_produto = array("id_comanda_produto" => $id_comanda_produto);
+
+            $id_comanda = $dataRegister['id_comanda'];
+            $id_tabela = $dataRegister['id_tabela'];
+            $gerar_pedido = $dataRegister['gerar_pedido'];
+            $quantidade = $dataRegister['quantidade'];
+            $observacao = $dataRegister['observacao'];
+            $produtos = (isset($dataRegister['produtos'])) ? $dataRegister['produtos'] : null;
+
+            $dataObservacao = "";
+
+            //Remocoes
+            $remocoes = (isset($dataRegister['remocoes'])) ? $dataRegister['remocoes'] : null;
+            if ($remocoes != null) {
+                $obsTemp = "";
+                foreach ($remocoes as $obs) {
+                    $obsTemp .= $obs . ", ";
+                }
+                $dataObservacao .= "Remoções: " . substr($obsTemp, 0, -2) . "||";
+            }
+
+            //Buscar valor do produto (Sera buscado a tabela do maior valor)
+            $in = "(";
+            foreach ($produtos as $p) {
+                $in .= $p . ",";
+            }
+            if (strlen($in) > 2) {
+                $in = substr($in, 0, -1) . ")";
+            }
+            $sql = "SELECT id_tabela_preco FROM tabela_preco 
+            WHERE id_produto in $in AND id_tabela = $id_tabela
+            ORDER BY valor desc LIMIT 1";
+            $data = $this->Crud_model->Query($sql)[0];
+
+            //Observacoes
+            if ($observacao != "") {
+                $observacao = $dataObservacao . $observacao . "||";
+            } else {
+                $observacao = $dataObservacao;
+            }
+            if (strlen($observacao) > 2) {
+                $observacao = substr($observacao, 0, -2);
+            } else {
+                $observacao = null;
+            }
+
+            //Inserindo dados na comanda
+            $dataModel = array(
+                'id_comanda' => $id_comanda,
+                'quantidade' => $quantidade,
+                'id_tabela_preco' => $data->id_tabela_preco,
+                'status_pedido' => $gerar_pedido ? 0 : 1,
+                'observacao' => $observacao);
+
+            $this->Crud_model->Delete('cp_produtos', array("id_cp" => $id_cp));
+            $res = $this->Crud_model->Update('comanda_produto', $dataModel, $id_comanda_produto);
+
+            //inserindo produtos
+            if ($produtos != null) {
+                foreach ($produtos as $p) {
+                    $res = $this->Crud_model->Insert('cp_produtos', array("id_cp" => $id_cp, "id_produto" => $p));
+                }
+            }
+
+            $adicionais = (isset($dataRegister['adicionais'])) ? $dataRegister['adicionais'] : null;
+
+            $sql = "SELECT id_cpa FROM cp_adicionais WHERE id_cp = $id_cp";
+            $id_cpas = $this->Crud_model->Query($sql);
+
+            $this->Crud_model->Delete('cp_adicionais', array("id_cp" => $id_cp));
+            foreach ($id_cpas as $id_cpa) {
+                $id_cpa = $id_cpa->id_cpa;
+                $this->Crud_model->Delete('cp_produtos', array("id_cp" => $id_cpa));
+                $this->Crud_model->Delete('comanda_produto', array("id_comanda_produto" => $id_cpa));
+            }
+
+            if ($adicionais != null && $res) {
+
+                foreach ($adicionais as $ads) {
+                    $adsProduto = explode('||', $ads);
+                    $adsId = $adsProduto[0];
+                    $adsTabela = $adsProduto[1];
+                    $dataModel = array(
+                        'id_comanda' => $id_comanda,
+                        'quantidade' => 1,
+                        'id_tabela_preco' => $adsTabela);
+
+                    $id = $this->Crud_model->InsertId('comanda_produto', $dataModel);
+
+                    if ($id) {
+                        $this->Crud_model->Insert('cp_produtos', array("id_cp" => $id, "id_produto" => $adsId));
+                        $res = $this->Crud_model->Insert('cp_adicionais', array("id_cp" => $id_cp, "id_cpa" => $id));
                     }
                 }
             }

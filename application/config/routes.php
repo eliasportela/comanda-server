@@ -66,6 +66,7 @@ $route['api/comandas/prudutos/(:any)/(:num)']['get'] = 'Comanda/GetProdutosComan
 $route['api/comandas/inserir/(:any)']['post'] = 'Comanda/RegisterComanda';
 $route['api/comandas/editar/(:any)']['post'] = 'Comanda/EditComanda';
 $route['api/comandas/inserir/produtos/(:any)']['post'] = 'Comanda/InserirProdutoComanda';
+$route['api/comandas/editar/produtos/(:num)/(:any)']['post'] = 'Comanda/EditarProdutoComanda';
 
 // Pedidos
 
