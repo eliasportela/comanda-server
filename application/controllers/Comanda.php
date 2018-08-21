@@ -275,7 +275,7 @@ class Comanda extends CI_Controller {
             INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
 			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
 			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 $where_clause
-            GROUP BY cp.id_comanda_produto ORDER BY cp.id_comanda_produto";
+            GROUP BY cp.id_comanda_produto, cat.id_categoria ORDER BY cp.id_comanda_produto";
 
             $pedidos = $this->Crud_model->Query($sql);
 
@@ -542,7 +542,7 @@ class Comanda extends CI_Controller {
     public function RemoveProdutoComanda()
     {
 
-        $chave = $this->uri->segment(4);
+        $chave = $this->uri->segment(5);
         $nivel_acesso = 3;
 
         $acesso_aprovado = $this->Crud_model->ValidarToken($chave, $nivel_acesso);
@@ -557,14 +557,32 @@ class Comanda extends CI_Controller {
                 return;
             }
 
-            $id_produto_comanda = $id_comanda = $dataRegister['id_comanda'];
-            $dataPar = array('id_produto_comanda' => $id_produto_comanda);
-            $dataModel = array('fg_ativo' => 0);
+            $id_cp = (int)$dataRegister['id_produto_comanda'];
 
-            $res = $this->Crud_model->Update('comanda_produto', $dataModel, $dataPar);
+            //Deletando os adicionais
+            $sql = "SELECT id_cpa FROM cp_adicionais WHERE id_cp = $id_cp";
+            $id_cpas = $this->Crud_model->Query($sql);
+
+            $this->Crud_model->Delete('cp_adicionais', array("id_cp" => $id_cp));
+            foreach ($id_cpas as $id_cpa) {
+                $id_cpa = $id_cpa->id_cpa;
+                $this->Crud_model->Delete('cp_produtos', array("id_cp" => $id_cpa));
+                $this->Crud_model->Delete('comanda_produto', array("id_comanda_produto" => $id_cpa));
+            }
+
+            //Deletando os produtos
+            $this->Crud_model->Delete('cp_produtos', array("id_cp" => $id_cp));
+
+            //Deletando a comanda_produto
+            $dataPar = array('id_produto_comanda' => $id_cp);
+
+            $res = $this->Crud_model->Delete('comanda_produto', $dataPar);
 
             if ($res) {
                 echo json_encode(array('result' => 'Sucesso'), JSON_UNESCAPED_UNICODE);
+                return;
+            } else {
+                echo json_encode(array('result' => 'Erro'), JSON_UNESCAPED_UNICODE);
                 return;
             }
 
