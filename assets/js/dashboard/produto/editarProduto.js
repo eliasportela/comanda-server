@@ -45,7 +45,7 @@ var IDPRODUTO = "";
 
 function getProdutoID(id) {
 
-	var url = base_urla + 'admin/api/produto/id/' + id;
+	var url = base_urla + 'api/produto/id/' + token + '?produtos=' + id;
 	var data = null;
 	var itens = null;
 	var tabelas = null;
@@ -57,6 +57,7 @@ function getProdutoID(id) {
 	var tabelaPrecos = $("#valores");	
 	tabelaPrecos.empty();
 
+    request("Buscando Dados do produto");
 	$.get(url, function (res) {
 		if (res) {
 			data = JSON.parse(res);
@@ -64,8 +65,7 @@ function getProdutoID(id) {
 			itens = data.itens;
 			tabelas = data.valores;
 
-		    console.log(data);
-			$("#nome_produto").val(produto.nome_produto);
+		    $("#nome_produto").val(produto.nome_produto);
 			$("#id_categoria").val(produto.id_categoria);
 			$("#referencia").val(produto.ref_produto);
 			$("#gerar_pedido").val(produto.gerar_pedido);
@@ -93,6 +93,7 @@ function getProdutoID(id) {
 			});
 		}
 
+		requestSuccess();
 	});
 }
 

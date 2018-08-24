@@ -11,30 +11,37 @@ var PAGEQTD = 1;
 // Select produtos
 function getProdutos(page){
 	var selector = $("#produtos");
-	var url = base_urla + 'admin/api/produto/' + page;
-	
-	selector.empty();
+	var url = base_urla + 'api/produtos/' + page;
+
 	var nome = "nome="+$("#nomesearch").val();
 	var tipo = "categoria="+$("#tiposearch").val();;
 	var referencia = "referencia="+$("#referenciasearch").val();
+	var ingrediente = "ingrediente="+$("#ingredientesearch").val();
 
-	//request("Buscando Dados");
-	$.get(url +'?'+nome+'&'+tipo+'&'+referencia, function(res) {
-		if (res) {
+	request("Buscando Dados");
+	$.get(url +'?'+nome+'&'+tipo+'&'+referencia+'&'+ingrediente, function(res) {
+        selector.empty();
+        if (res) {
 			data = JSON.parse(res);
-			PAGEQTD = data.pages; 
+			PAGEQTD = data.pages;
 			data.result.forEach(function(obj){
 				var col = "";
+				console.log(obj.ingrediente);
 				col += "<td>"+"<i class='fa fa-tag'></i></td>"
 				col += "<td>"+obj.ref_produto+"</td>"
 				col += "<td>"+obj.nome_produto+"</td>"
+				col += "<td>"+(obj.ingrediente === '0' ? "Não" : "Sim")+"</td>"
 				col += "<td>"+obj.nome_categoria+"</td>"
 				selector.append("<tr onclick=viewProduto("+obj.id_produto+")>"+col+"</tr>");
 			});
 			$("#naoencontrado").css("display","none");
+			$("#loadSpinner").css("display","none");
+            requestSuccess();
 		}else{
 			data = null;
-			$("#naoencontrado").css("display","block");
+			$("#naoencontrado").css("display","none");
+			$("#loadSpinner").css("display","block");
+            requestSuccess();
 		}
 	})
 	.done(function(){
@@ -51,6 +58,7 @@ function limparSearch() {
 	$("#nomesearch").val("");
 	$("#tiposearch").val("0");
 	$("#referenciasearch").val("");
+	$("#ingredientesearch").val("0");
 	getProdutos(1);
 }
 
@@ -67,7 +75,6 @@ function pagination(tipo){
 		$("#btnanterior").removeAttr("disabled");
 	}
 }
-
 
 function viewProduto(id){
 	window.location.href = base_urla +"admin/produto/" + id;

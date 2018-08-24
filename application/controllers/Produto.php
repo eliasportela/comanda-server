@@ -86,7 +86,7 @@ class Produto extends CI_Controller
                 $data['produto'] = $dataModel->id_produto;
                 $data['editar'] = true;
                 $data['coluna'] = "m4";
-                $data['tabela'] = $this->Crud_model->ReadAll('tabela_preco');
+                $data['tabela'] = $this->Crud_model->ReadAll('tabela_produto');
 
                 $sql = "SELECT id_produto, nome_produto FROM produto WHERE fg_ativo = 1 AND id_categoria = 1";
                 $data['produtos'] = $this->Crud_model->Query($sql);
@@ -146,7 +146,7 @@ class Produto extends CI_Controller
 
             if ($this->input->get("produtos") != null) {
                 $par = $this->input->get("produtos");
-                $whereClause = "AND p.id_produto in = " . $par;
+                $whereClause = "AND p.id_produto = " . $par;
             }
 
             $sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria, gerar_pedido
@@ -156,7 +156,7 @@ class Produto extends CI_Controller
             $res = $this->Crud_model->Query($sql);
             $res = $res[0];
 
-            die(var_dump($this->input->get()));
+            //die(var_dump($this->input->get()));
 
             if ($res) {
                 $json = json_encode($res, JSON_UNESCAPED_UNICODE);
@@ -164,7 +164,7 @@ class Produto extends CI_Controller
                 $sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto 
                     FROM item_produto ip 
                     INNER JOIN produto p ON (p.id_produto = ip.id_produto_item) 
-                    WHERE ip.id_produto = $id_produto";
+                    WHERE ip.id_produto = $par";
 
                 $resItens = $this->Crud_model->Query($sql);
 
@@ -172,7 +172,7 @@ class Produto extends CI_Controller
                     FROM tabela_preco tp
                     INNER JOIN produto p ON (p.id_produto = tp.id_produto)
                     INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
-                    WHERE p.fg_ativo = 1 AND p.id_produto = $id_produto";
+                    WHERE p.fg_ativo = 1 AND p.id_produto = $par";
 
                 $resValores = $this->Crud_model->Query($sql);
 
@@ -194,13 +194,14 @@ class Produto extends CI_Controller
 
     public function Get()
     {
-        $ref = $this->uri->segment(4);
-        $page = $ref * 20 - 20;
+        $pagination = $this->uri->segment(3);
+        $page = $pagination * 20 - 20;
 
         //Pesquisa
         $referencia = "1=1";
         $nome = "1=1";
         $categoria = "1=1";
+        $ingrediente = "1=1";
 
         if ($this->input->get("referencia") != null) {
             $referencia = "p.ref_produto = '" . $this->input->get("referencia") . "'";
@@ -214,9 +215,13 @@ class Produto extends CI_Controller
             $nome = "p.nome_produto LIKE '%" . $this->input->get("nome") . "%'";
         }
 
+        if ($this->input->get("ingrediente") != null) {
+            $ingrediente = "p.ingrediente = " . $this->input->get("ingrediente");
+        }
+
         $sqlCount = "SELECT COUNT(*) as qtd FROM produto p 
 			INNER JOIN categoria_produto c ON (p.id_categoria = c.id_categoria)
-			WHERE $nome and $referencia and $categoria and p.fg_ativo = 1";
+			WHERE $nome and $referencia and $categoria and $ingrediente and p.fg_ativo = 1";
 
         $res1 = $this->Crud_model->Query($sqlCount);
         $qtd = 0;
@@ -227,10 +232,10 @@ class Produto extends CI_Controller
             $qtd = 1;
         endif;
 
-        if ($ref > 0):
+        if ($pagination > 0):
             $sql = "SELECT * FROM produto p 
 			INNER JOIN categoria_produto c ON (p.id_categoria = c.id_categoria)
-			WHERE $nome and $referencia and $categoria and p.fg_ativo = 1
+			WHERE $nome and $referencia and $categoria and $ingrediente and p.fg_ativo = 1
 			LIMIT 20 OFFSET $page";
             $res = $this->Crud_model->Query($sql);
             if ($res):
@@ -259,11 +264,13 @@ class Produto extends CI_Controller
 
                 $nome_produto = trim($dataRegister['nome_produto']);
                 $id_categoria = trim($dataRegister['id_categoria']);
+                $ingrediente = trim($dataRegister['ingrediente']);
                 $gerar_pedido = trim($dataRegister['gerar_pedido']);
 
                 $dataModel = array(
                     'nome_produto' => $nome_produto,
                     'id_categoria' => $id_categoria,
+                    'ingrediente' => $ingrediente,
                     'gerar_pedido' => $gerar_pedido,
                     'ref_produto' => rand(1, 1000000));
 
@@ -272,7 +279,7 @@ class Produto extends CI_Controller
                 if ($res):
 
                     //Editando a referencia do produto
-                    $res2 = $this->Crud_model->Update('produto', array('ref_produto' => 'R0' . $res), array('id_produto' => $res));
+                    $this->Crud_model->Update('produto', array('ref_produto' => 'R0' . $res), array('id_produto' => $res));
 
                     echo $res;
                     $this->output->set_status_header('200');

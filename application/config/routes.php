@@ -45,10 +45,11 @@ $route['api/autenticar']['post'] = 'User/getAutenticacao';
 
 // Produto
 
+$route['api/produtos/(:any)']['get'] = 'Produto/Get';
 $route['api/produtos/precos/(:num)/(:any)']['get'] = 'Produto/getProdutosTabelaPreco';
 $route['api/produtos/itens/(:any)']['get'] = 'Produto/GetProdutosItens';
 
-$route['admin/api/produto/id/(:num)']['get'] = 'Produto/GetId'; //REMOCOES
+$route['api/produto/id/(:any)']['get'] = 'Produto/GetId';
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar']['post'] = 'Produto/Edit';
