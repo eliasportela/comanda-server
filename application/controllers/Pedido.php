@@ -8,22 +8,12 @@ class Pedido extends CI_Controller {
 	public function index(){
 
 		//sql busca
-		$sql = 'SELECT c.id_comanda, c.status, DATE_FORMAT(c.data_comanda, "%d-%m") as data_comanda, DATE_FORMAT(c.data_comanda, "%h:%i") as hora_comanda, c.ref_comanda, c.tipo_comanda, c.mesa as nome_mesa, cl.nome_cliente 
-        FROM comanda c 
-        LEFT JOIN cliente cl ON (cl.id_cliente = c.id_cliente_viagem)
-        where c.status = 1 and 1=1 and 1=1 order by c.data_comanda desc';
-
-		$data['comandas'] = $this->Crud_model->Query($sql);
-        
-        //$sql = "SELECT count(*) as qtd FROM contato where $visualizado";
-		//$data['qtd'] = $this->Crud_model->Query($sql);
-
 		$menu['id_page'] = 2;
 		$header['title'] = 'Dash | Pedido';
 		$header['page'] = '1';
 
         $this->load->view('dashboard/template/commons/header',$header);
-        $this->load->view('dashboard/pedido/home',$data);
+        $this->load->view('dashboard/pedido/home');
 		$this->load->view('dashboard/template/commons/footer');
 	}
 
@@ -33,7 +23,7 @@ class Pedido extends CI_Controller {
         $chave = $this->uri->segment(4);
         $nivel_acesso = 1;
 
-        $pagination = "LIMIT 10 OFFSET ".($pagina - 1) * 10;
+        $pagination = "LIMIT 10 OFFSET ".($pagina - 1) * 100;
         $acesso_aprovado = $this->Crud_model->ValidarToken($chave,$nivel_acesso);
 
         if ($acesso_aprovado) {
@@ -63,14 +53,18 @@ class Pedido extends CI_Controller {
                 }
             }
 
-            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.nome_categoria, cat.id_categoria, p.nome_produto, cp.quantidade, t.nome_tabela, cp.status_pedido, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.observacao
-			FROM comanda_produto cp
+            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.id_categoria, cat.nome_categoria, GROUP_CONCAT(p.nome_produto SEPARATOR '||') as nome_produto, cp.quantidade, t.id_tabela, t.nome_tabela, cp.observacao, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.status_pedido
+			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
-			INNER JOIN produto p ON (p.id_produto = cp.id_produto)
+			INNER JOIN cp_produtos cpp ON (cp.id_comanda_produto = cpp.id_cp)
+            INNER JOIN produto p ON (p.id_produto = cpp.id_produto)
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
-			INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
+            INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
 			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
-			WHERE cp.fg_ativo = 1 AND p.gerar_pedido = 1 $where_clause $order_clause $pagination";
+			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 AND p.gerar_pedido = 1 $where_clause
+            GROUP BY cp.id_comanda_produto $order_clause";
+
+            //die(var_dump($sql));
 
             $res = $this->Crud_model->Query($sql);
 

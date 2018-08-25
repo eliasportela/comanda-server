@@ -74,8 +74,8 @@
                         <div class="w3-col m2 w3-margin-top">
                             <label for="ingrediente">Ingrediente</label>
                             <select class="w3-select w3-white w3-border" id="ingrediente" name="ingrediente">
-                                <option value="false">Não</option>
-                                <option value="true">Sim</option>
+                                <option value="0">Não</option>
+                                <option value="1">Sim</option>
                             </select>
                         </div>
                     </div>

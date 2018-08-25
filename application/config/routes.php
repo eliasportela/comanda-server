@@ -48,9 +48,10 @@ $route['api/autenticar']['post'] = 'User/getAutenticacao';
 $route['api/produtos/(:any)']['get'] = 'Produto/Get';
 $route['api/produtos/precos/(:num)/(:any)']['get'] = 'Produto/getProdutosTabelaPreco';
 $route['api/produtos/itens/(:any)']['get'] = 'Produto/GetProdutosItens';
-
 $route['api/produto/id/(:any)']['get'] = 'Produto/GetId';
+
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
+
 $route['admin/api/produto']['post'] = 'Produto/Register';
 $route['admin/api/produto/editar']['post'] = 'Produto/Edit';
 $route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';

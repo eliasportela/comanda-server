@@ -68,6 +68,7 @@ function getProdutoID(id) {
 		    $("#nome_produto").val(produto.nome_produto);
 			$("#id_categoria").val(produto.id_categoria);
 			$("#referencia").val(produto.ref_produto);
+			$("#ingrediente").val(produto.ingrediente);
 			$("#gerar_pedido").val(produto.gerar_pedido);
 
 		} else {

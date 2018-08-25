@@ -43,7 +43,6 @@
   <div class="w3-panel">
     <div class="w3-container w3-white w3-padding-16 w3-center" style="min-height: 85vh;">
       <div class="w3-row-padding" id="basePedido">
-
       </div>
     </div>
   </div>

@@ -275,7 +275,7 @@ class Comanda extends CI_Controller {
             INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
 			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
 			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 $where_clause
-            GROUP BY cp.id_comanda_produto, cat.id_categoria ORDER BY cp.id_comanda_produto";
+            GROUP BY cp.id_comanda_produto ORDER BY cp.id_comanda_produto";
 
             $pedidos = $this->Crud_model->Query($sql);
 
@@ -551,13 +551,13 @@ class Comanda extends CI_Controller {
 
             $dataRegister = $this->input->post();
 
-            if ($dataRegister["id_produto_comanda"] == null) {
+            if ($dataRegister["id_comanda_produto"] == null) {
                 echo json_encode(array('result' => 'Erro nos parametros enviados'), JSON_UNESCAPED_UNICODE);
                 $this->output->set_status_header('500');
                 return;
             }
 
-            $id_cp = (int)$dataRegister['id_produto_comanda'];
+            $id_cp = (int)$dataRegister['id_comanda_produto'];
 
             //Deletando os adicionais
             $sql = "SELECT id_cpa FROM cp_adicionais WHERE id_cp = $id_cp";
@@ -574,7 +574,7 @@ class Comanda extends CI_Controller {
             $this->Crud_model->Delete('cp_produtos', array("id_cp" => $id_cp));
 
             //Deletando a comanda_produto
-            $dataPar = array('id_produto_comanda' => $id_cp);
+            $dataPar = array('id_comanda_produto' => $id_cp);
 
             $res = $this->Crud_model->Delete('comanda_produto', $dataPar);
 

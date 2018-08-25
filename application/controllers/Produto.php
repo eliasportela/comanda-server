@@ -43,6 +43,7 @@ class Produto extends CI_Controller
         if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)) {
 
             $data["categoria_produto"] = $this->Crud_model->ReadAll("categoria_produto");
+            $data["tabela_ingrediente"] = $this->Crud_model->ReadAll("tabela_ingrediente");
 
             $header['title'] = "Dash | Cadastro produto";
             $data['title'] = "Cadastrar Produto";
@@ -73,13 +74,22 @@ class Produto extends CI_Controller
 
             //categoria produto
             $data["categoria_produto"] = $this->Crud_model->ReadAll("categoria_produto");
+            $data["tabela_ingrediente"] = $this->Crud_model->ReadAll("tabela_ingrediente");
 
             $header['title'] = "Dash | Editar Produto";
             $data['title'] = "Editar Produto";
             $data['idFormulario'] = "editarProduto";
             $menu['id_page'] = 3;
 
-            $dataModel = $this->Crud_model->Read('produto', array('id_produto' => $this->uri->segment(3)));
+            $id_produto = $this->uri->segment(3);
+
+            $sql = "SELECT p.id_produto, c.id_ingrediente 
+                  FROM produto p
+                  INNER JOIN categoria_produto c ON p.id_categoria = c.id_categoria
+                  WHERE p.id_produto = $id_produto";
+
+            $dataModel = $this->Crud_model->Query($sql);
+            $dataModel = $dataModel[0];
 
             if ($dataModel) {
 
@@ -88,7 +98,10 @@ class Produto extends CI_Controller
                 $data['coluna'] = "m4";
                 $data['tabela'] = $this->Crud_model->ReadAll('tabela_produto');
 
-                $sql = "SELECT id_produto, nome_produto FROM produto WHERE fg_ativo = 1 AND id_categoria = 1";
+                $sql = "SELECT id_produto, nome_produto 
+                        FROM produto p
+                        INNER JOIN categoria_produto c ON p.id_categoria = c.id_categoria
+                        WHERE p.fg_ativo = 1 AND p.ingrediente = true AND c.id_ingrediente = $dataModel->id_ingrediente ORDER BY p.nome_produto ASC";
                 $data['produtos'] = $this->Crud_model->Query($sql);
 
                 $this->load->view('dashboard/template/commons/header', $header);
@@ -149,7 +162,7 @@ class Produto extends CI_Controller
                 $whereClause = "AND p.id_produto = " . $par;
             }
 
-            $sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria, gerar_pedido
+            $sql = "SELECT id_produto, nome_produto, ref_produto, id_categoria, gerar_pedido, p.ingrediente
 			FROM produto p
 			WHERE fg_ativo = 1 $whereClause";
 
@@ -161,7 +174,7 @@ class Produto extends CI_Controller
             if ($res) {
                 $json = json_encode($res, JSON_UNESCAPED_UNICODE);
 
-                $sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto 
+                $sql = "SELECT p.id_produto, p.nome_produto, p.ref_produto
                     FROM item_produto ip 
                     INNER JOIN produto p ON (p.id_produto = ip.id_produto_item) 
                     WHERE ip.id_produto = $par";
@@ -270,7 +283,7 @@ class Produto extends CI_Controller
                 $dataModel = array(
                     'nome_produto' => $nome_produto,
                     'id_categoria' => $id_categoria,
-                    'ingrediente' => $ingrediente,
+                    'ingrediente' => $ingrediente == 0 ? false : true,
                     'gerar_pedido' => $gerar_pedido,
                     'ref_produto' => rand(1, 1000000));
 
@@ -295,8 +308,6 @@ class Produto extends CI_Controller
     {
 
         $nivel_user = 1;
-        $foto_name = null;
-        $comprovante_name = null;
 
         if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
 
@@ -307,6 +318,7 @@ class Produto extends CI_Controller
                 $id_produto = trim($dataRegister['id_produto']);
                 $nome_produto = trim($dataRegister['nome_produto']);
                 $id_categoria = trim($dataRegister['id_categoria']);
+                $ingrediente = trim($dataRegister['ingrediente']);
                 $gerar_pedido = trim($dataRegister['gerar_pedido']);
                 $referencia = trim($dataRegister['referencia']);
 
@@ -314,6 +326,7 @@ class Produto extends CI_Controller
                     'nome_produto' => $nome_produto,
                     'id_categoria' => $id_categoria,
                     'gerar_pedido' => $gerar_pedido,
+                    'ingrediente' => $ingrediente == 0 ? false : true,
                     'ref_produto' => $referencia);
 
                 $res = $this->Crud_model->Update('produto', $dataModel, array('id_produto' => $id_produto));
@@ -323,7 +336,7 @@ class Produto extends CI_Controller
                     if (isset($dataRegister['produtos'])):
                         for ($i = 0; $i < count($dataRegister['produtos']); $i++) {
                             $produtoModel = array('id_produto' => $id_produto, 'id_produto_item' => $dataRegister['produtos'][$i]);
-                            $res = $this->Crud_model->Insert('item_produto', $produtoModel);
+                            $this->Crud_model->Insert('item_produto', $produtoModel);
                         }
                     endif;
 
@@ -332,7 +345,7 @@ class Produto extends CI_Controller
                             $tabelaModel = array('id_produto' => $id_produto,
                                 'id_tabela' => $dataRegister['precos'][$i],
                                 'valor' => $dataRegister['valores'][$i]);
-                            $res = $this->Crud_model->Insert('tabela_produto', $tabelaModel);
+                            $this->Crud_model->Insert('tabela_preco', $tabelaModel);
                         }
                     endif;
 
