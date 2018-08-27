@@ -12,6 +12,7 @@
     font-size: 0.92em;
     padding: 0px 16px 16px;
     font-weight: bold;
+      height: 200px;
   }
   .card-body .ads{
     margin-top: 8px
