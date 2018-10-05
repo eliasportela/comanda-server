@@ -52,8 +52,10 @@ function addNovoPedido(obj){
 function addPedido(cor,pedido) {
 
 	var obs = [];
-	for (var i = 0; i < pedido.observacoes.length; i++) {
-      	obs.push(pedido.observacoes[i]);
+	if (pedido.adicionais !== null) {
+        for (var i = 0; i < pedido.adicionais.length; i++) {
+            obs.push(pedido.adicionais[i].nome_produto);
+        }
     }
 
 	var pedido = '<div id="pedido'+pedido.id_comanda_produto+'" class="w3-col l2 m6 w3-left-align w3-margin-top">'+
@@ -70,10 +72,12 @@ function addPedido(cor,pedido) {
           '<h5><b>Mesa '+pedido.mesa+'</b></h5>' + normalizarNome(pedido.nome_produto) + ' </br>' +
           '<div class="ads">' +
           '- QTD: '+ pedido.quantidade +' </br>' +
+          '- Tamanho: '+ pedido.nome_tabela +' </br>' +
           '- Produto: '+ pedido.nome_categoria +' </br>' +
-          (obs[0] !== undefined ? '- ' + obs[0] + '<br>' : "") +
-          (obs[1] !== undefined ? '- ' + obs[1] + '<br>' : "") +
-          (obs[2] !== undefined ? '- ' + obs[2] + '<br>' : "") +
+          '- '+ pedido.observacao +' </br>' +
+          (obs[0] !== undefined ? '- C/ ' + obs[0] + '<br>' : "") +
+          (obs[1] !== undefined ? '- C/' + obs[1] + '<br>' : "") +
+          (obs[2] !== undefined ? '- C/' + obs[2] + '<br>' : "") +
           '</div>' +
         '</div>' +
       '</div>' +

@@ -53,7 +53,7 @@ class Pedido extends CI_Controller {
                 }
             }
 
-            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.id_categoria, cat.nome_categoria, GROUP_CONCAT(p.nome_produto SEPARATOR '||') as nome_produto, cp.quantidade, t.id_tabela, t.nome_tabela, cp.observacao, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.status_pedido
+            $sql = "SELECT cp.id_comanda_produto, c.mesa, cat.id_categoria, cat.nome_categoria, GROUP_CONCAT(p.nome_produto SEPARATOR '||') as nome_produto, cp.quantidade, t.id_tabela, t.nome_tabela, cp.observacao, DATE_FORMAT(cp.data_pedido, '%h:%i') as horas, cp.status_pedido, cp.observacao
 			FROM comanda_produto cp 
 			INNER JOIN comanda c ON (c.id_comanda = cp.id_comanda)
 			INNER JOIN cp_produtos cpp ON (cp.id_comanda_produto = cpp.id_cp)
@@ -61,8 +61,8 @@ class Pedido extends CI_Controller {
 			INNER JOIN categoria_produto cat ON (cat.id_categoria = p.id_categoria)
             INNER JOIN tabela_preco tp ON (tp.id_tabela_preco = cp.id_tabela_preco)
 			INNER JOIN tabela_produto t ON (t.id_tabela = tp.id_tabela)
-			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 AND p.gerar_pedido = 1 $where_clause
-            GROUP BY cp.id_comanda_produto $order_clause";
+			WHERE cp.fg_ativo = 1 AND p.ingrediente != 1 AND cp.status_pedido = 0 AND p.gerar_pedido = 1 $where_clause
+            GROUP BY cp.id_comanda_produto, cat.id_categoria $order_clause";
 
             //die(var_dump($sql));
 
@@ -73,11 +73,29 @@ class Pedido extends CI_Controller {
                 $observacao = [];
                 foreach ($res as $obs) {
                     $obs = (array)$obs;
+                    /*
                     if ($obs["observacao"] == "" || $obs["observacao"] == null) {
                         $json[] = array_merge($obs, array('observacoes' => []));
                     } else {
                         $observacao = explode("||", $obs["observacao"]);
                         $json[] = array_merge($obs, array('observacoes' => $observacao));
+                    }
+                    */
+                    $id = $obs["id_comanda_produto"];
+
+                    $sql = "SELECT p.id_produto, p.nome_produto, cp.id_tabela_preco
+                        FROM cp_adicionais cpa
+                        INNER JOIN comanda_produto cp ON (cpa.id_cpa = cp.id_comanda_produto)
+                        INNER JOIN cp_produtos cpp ON (cp.id_comanda_produto = cpp.id_cp)
+                        INNER JOIN produto p ON (cpp.id_produto  = p.id_produto) 
+                        WHERE cpa.id_cp = $id";
+
+                    $res = $this->Crud_model->Query($sql);
+                    //$res = $res[0];
+                    if ($res) {
+                        $json[] = array_merge($obs, array('adicionais' => $res));
+                    } else {
+                        $json[] = array_merge($obs, array('adicionais' => null));
                     }
                 }
 
