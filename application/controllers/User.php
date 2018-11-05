@@ -279,6 +279,7 @@ class User extends CI_Controller {
 
                 } else {
                     //senha incorreta
+                    $this->output->set_status_header('401');
                     $json = array_merge($json,array('result' => 'Senha Incorreta','chave' => null));
                 }
             }
@@ -287,6 +288,7 @@ class User extends CI_Controller {
 
         //Email invalido
         if (!$json) {
+            $this->output->set_status_header('401');
             $json = array_merge($json,array('result' => 'Usuário inválido','chave' => null));
         }
 
