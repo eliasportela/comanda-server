@@ -120,31 +120,13 @@ class Produto extends CI_Controller
 
     }
 
-    //Delete registro
+    //Desantivando produto
     public function Remove()
     {
-        $nivel_user = 2;
-        if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
-            $dataId = (int)$this->uri->segment(5);
-            if ($dataId > 0):
-
-                $sql = "SELECT id_propriedade FROM propriedade WHERE id_produto = $dataId";
-                $query = $this->Crud_model->Query($sql);
-                if ($query) {
-                    foreach ($query as $q) {
-                        $res = $this->Crud_model->Delete('safra_previsao', array('id_propriedade' => $q->id_propriedade));
-                        $res = $this->Crud_model->Delete('safra_fechamento', array('id_propriedade' => $q->id_propriedade));
-                        $res = $this->Crud_model->Delete('safra_cafe', array('id_propriedade' => $q->id_propriedade));
-                    }
-                }
-                //remove todas as propriedades
-                $propriedade = $this->Crud_model->Delete('propriedade', array('id_produto' => $dataId));
-                $res = $this->Crud_model->Delete('produto', array('id_produto' => $dataId));
-
-            endif;
-        else:
-            $this->output->set_status_header('400');
-        endif;
+        $dataId = (int)$this->uri->segment(4);
+        if ($dataId > 0) {
+            $this->Crud_model->Update('produto', array('fg_ativo' => 0), array('id_produto' => $dataId));
+        }
     }
 
     public function getID()
@@ -253,7 +235,7 @@ class Produto extends CI_Controller
             $res = $this->Crud_model->Query($sql);
             if ($res):
                 $json = json_encode($res, JSON_UNESCAPED_UNICODE);
-                echo '{"pages":' . $qtd . ',"result":' . $json . '}';
+                echo '{"page":' . $pagination . ',"pages":' . $qtd . ',"result":' . $json . '}';
                 return;
             endif;
         else:
@@ -264,98 +246,86 @@ class Produto extends CI_Controller
     //Inserindo registros
     public function Register()
     {
+        $dataRegister = $this->input->post();
+        if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
 
-        $nivel_user = 1;
-        $foto_name = null;
-        $comprovante_name = null;
+            $nome_produto = trim($dataRegister['nome_produto']);
+            $id_categoria = trim($dataRegister['id_categoria']);
+            $ingrediente = trim($dataRegister['ingrediente']);
+            $gerar_pedido = trim($dataRegister['gerar_pedido']);
 
-        if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
+            $dataModel = array(
+                'nome_produto' => $nome_produto,
+                'id_categoria' => $id_categoria,
+                'ingrediente' => $ingrediente == 0 ? false : true,
+                'gerar_pedido' => $gerar_pedido,
+                'ref_produto' => rand(1, 1000000));
 
-            $dataRegister = $this->input->post();
-            if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
+            $res = $this->Crud_model->InsertId('produto', $dataModel);
 
+            if ($res):
 
-                $nome_produto = trim($dataRegister['nome_produto']);
-                $id_categoria = trim($dataRegister['id_categoria']);
-                $ingrediente = trim($dataRegister['ingrediente']);
-                $gerar_pedido = trim($dataRegister['gerar_pedido']);
+                //Editando a referencia do produto
+                $this->Crud_model->Update('produto', array('ref_produto' => 'R0' . $res), array('id_produto' => $res));
 
-                $dataModel = array(
-                    'nome_produto' => $nome_produto,
-                    'id_categoria' => $id_categoria,
-                    'ingrediente' => $ingrediente == 0 ? false : true,
-                    'gerar_pedido' => $gerar_pedido,
-                    'ref_produto' => rand(1, 1000000));
-
-                $res = $this->Crud_model->InsertId('produto', $dataModel);
-
-                if ($res):
-
-                    //Editando a referencia do produto
-                    $this->Crud_model->Update('produto', array('ref_produto' => 'R0' . $res), array('id_produto' => $res));
-
-                    echo $res;
-                    $this->output->set_status_header('200');
-                    return;
-                endif;
+                echo $res;
+                $this->output->set_status_header('200');
+                return;
             endif;
         else:
             $this->output->set_status_header('400');
         endif;
     }
 
-    public function Edit()
-    {
+    public function Edit() {
 
-        $nivel_user = 1;
+        $dataRegister = $this->input->post();
 
-        if (($this->session->userdata('logged')) and ($this->session->userdata('administrativo') >= $nivel_user)):
+        if ($dataRegister AND $dataRegister['nome_produto'] != NULL) {
 
-            $dataRegister = $this->input->post();
-            if ($dataRegister AND $dataRegister['nome_produto'] != NULL):
+            $id_produto = trim($dataRegister['id_produto']);
+            $nome_produto = trim($dataRegister['nome_produto']);
+            $id_categoria = trim($dataRegister['id_categoria']);
+            $ingrediente = trim($dataRegister['ingrediente']);
+            $gerar_pedido = trim($dataRegister['gerar_pedido']);
+            $referencia = trim($dataRegister['ref_produto']);
 
+            $dataModel = array(
+                'nome_produto' => $nome_produto,
+                'id_categoria' => $id_categoria,
+                'gerar_pedido' => $gerar_pedido,
+                'ingrediente' => $ingrediente == 0 ? false : true,
+                'ref_produto' => $referencia);
 
-                $id_produto = trim($dataRegister['id_produto']);
-                $nome_produto = trim($dataRegister['nome_produto']);
-                $id_categoria = trim($dataRegister['id_categoria']);
-                $ingrediente = trim($dataRegister['ingrediente']);
-                $gerar_pedido = trim($dataRegister['gerar_pedido']);
-                $referencia = trim($dataRegister['referencia']);
+            $res = $this->Crud_model->Update('produto', $dataModel, array('id_produto' => $id_produto));
 
-                $dataModel = array(
-                    'nome_produto' => $nome_produto,
-                    'id_categoria' => $id_categoria,
-                    'gerar_pedido' => $gerar_pedido,
-                    'ingrediente' => $ingrediente == 0 ? false : true,
-                    'ref_produto' => $referencia);
+            if ($res) {
 
-                $res = $this->Crud_model->Update('produto', $dataModel, array('id_produto' => $id_produto));
+                if (isset($dataRegister['produtos'])) {
+                    $this->Crud_model->Delete('item_produto', array('id_produto' => $id_produto));
+                    for ($i = 0; $i < count($dataRegister['produtos']); $i++) {
+                        $produtoModel = array('id_produto' => $id_produto, 'id_produto_item' => $dataRegister['produtos'][$i]);
+                        $this->Crud_model->Insert('item_produto', $produtoModel);
+                    }
+                }
 
-                if ($res):
+                if (isset($dataRegister['precos'])) {
+                    $this->Crud_model->Delete('tabela_preco', array('id_produto' => $id_produto));
+                    for ($i = 0; $i < count($dataRegister['precos']); $i++) {
+                        $tabelaModel = array('id_produto' => $id_produto,
+                            'id_tabela' => $dataRegister['precos'][$i],
+                            'valor' => $dataRegister['valores'][$i]);
+                        $this->Crud_model->Insert('tabela_preco', $tabelaModel);
+                    }
+                }
 
-                    if (isset($dataRegister['produtos'])):
-                        for ($i = 0; $i < count($dataRegister['produtos']); $i++) {
-                            $produtoModel = array('id_produto' => $id_produto, 'id_produto_item' => $dataRegister['produtos'][$i]);
-                            $this->Crud_model->Insert('item_produto', $produtoModel);
-                        }
-                    endif;
+                $this->output->set_status_header('200');
+                return;
 
-                    if (isset($dataRegister['precos'])):
-                        for ($i = 0; $i < count($dataRegister['precos']); $i++) {
-                            $tabelaModel = array('id_produto' => $id_produto,
-                                'id_tabela' => $dataRegister['precos'][$i],
-                                'valor' => $dataRegister['valores'][$i]);
-                            $this->Crud_model->Insert('tabela_preco', $tabelaModel);
-                        }
-                    endif;
-
-                    $this->output->set_status_header('200');
-                    return;
-                endif;
-            endif;
-        else:
-            $this->output->set_status_header('400');
-        endif;
+            } else {
+                $this->output->set_status_header('400');
+            }
+        }
 
     }
 

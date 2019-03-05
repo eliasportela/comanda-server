@@ -95,7 +95,7 @@ class Comanda extends CI_Controller {
         if ($acesso_aprovado) {
 
             $where_clause = "WHERE 1=1 ";
-            $order_clause = "";
+            $order_clause = "ORDER BY c.mesa asc";
 
             //ID da comanda
             if ($this->input->get('id_comanda') != null) {
@@ -141,9 +141,9 @@ class Comanda extends CI_Controller {
             if ($this->input->get('ordenar') != null) {
                 $order = ($this->input->get('ordenar') === 'true');
                 if ($order) {
-                    $order_clause = "ORDER BY c.data_comanda desc";
+                    $order_clause = ", c.data_comanda desc";
                 } else {
-                    $order_clause = "ORDER BY c.data_comanda asc";
+                    $order_clause = ", c.data_comanda asc";
                 }
             }
 

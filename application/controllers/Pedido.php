@@ -146,7 +146,6 @@ class Pedido extends CI_Controller {
             }
 
             if ($data_model) {
-
                 $res = $this->Crud_model->Update('comanda_produto', $data_model, array('id_comanda_produto' => $id_pedido));
                 if ($res) {
                     $this->output->set_status_header('200');

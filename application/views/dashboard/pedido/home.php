@@ -1,5 +1,4 @@
 <style type="text/css">
-
   .card {
     color: #000;
     box-shadow: 3px 18px 5px 0px rgba(222,222,222,1);

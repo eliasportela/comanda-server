@@ -27,7 +27,6 @@
     </header>
     <div style="margin: 0 16px">
         <form method="POST" action="" id="<?= $idFormulario ?>">
-
             <!--Edicao-->
             <?php if ($editar): ?>
                 <input type="hidden" id="id_produto" name="id_produto" value="<?= $produto ?>">

@@ -44,25 +44,18 @@ $route['admin/pedidos']['get'] = 'Pedido';
 $route['api/autenticar']['post'] = 'User/getAutenticacao';
 
 // Produto
-
 $route['api/produtos/(:any)']['get'] = 'Produto/Get';
 $route['api/produtos/precos/(:num)/(:any)']['get'] = 'Produto/getProdutosTabelaPreco';
 $route['api/produtos/itens/(:any)']['get'] = 'Produto/GetProdutosItens';
 $route['api/produto/id/(:any)']['get'] = 'Produto/GetId';
 
+$route['api/produto']['post'] = 'Produto/Register';
+$route['api/produto/editar']['post'] = 'Produto/Edit';
+$route['api/produto/remover/(:num)'] = 'Produto/Remove';
+
 $route['admin/api/produtos-categoria-tabela/(:num)']['get'] = 'Produto/getProdutosCategoriaTabela';
 
-$route['admin/api/produto']['post'] = 'Produto/Register';
-$route['admin/api/produto/editar']['post'] = 'Produto/Edit';
-$route['admin/api/produto/remover/(:num)'] = 'Produto/Remove';
-
-#Produto Preço e Ingredientes
-
-$route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeletePrevisao';
-$route['admin/api/produto-tabela/remover/(:num)/(:num)'] = 'Safra/DeleteFechamento';
-
 //Comanda
-
 $route['api/comandas/(:num)/(:any)']['get'] = 'Comanda/GetComandas';
 $route['api/comandas/prudutos/(:any)/(:num)']['get'] = 'Comanda/GetProdutosComanda';
 $route['api/comandas/inserir/(:any)']['post'] = 'Comanda/RegisterComanda';
@@ -72,7 +65,6 @@ $route['api/comandas/editar/produtos/(:num)/(:any)']['post'] = 'Comanda/EditarPr
 $route['api/comandas/remover/produtos/(:any)']['post'] = 'Comanda/RemoveProdutoComanda';
 
 // Pedidos
-
 $route['api/pedidos/(:num)/(:any)'] = 'Pedido/GetPedidos';
 $route['api/pedidos/editar/(:any)']['post'] = 'Pedido/EditPedido';
 
@@ -80,11 +72,11 @@ $route['api/pedidos/editar/(:any)']['post'] = 'Pedido/EditPedido';
 $route['api/cardapio/(:any)']['get'] = 'Cardapio/ListarCardapio';
 
 //Util
-
 $route['api/categorias/(:any)']['get'] = 'Util/GetCategoriasProdutos';
-$route['admin/api/tabela-categoria/(:num)'] = 'Util/GetTabelaCategoria';
+$route['api/ingredientes/(:any)/(:num)']['get'] = 'Util/GetIngredientesProduto';
+$route['api/tabelas/(:any)'] = 'Util/GetTabelas';
+$route['api/tabela-categoria/(:num)'] = 'Util/GetTabelaCategoria';
 
 // 404 e erros
-
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
